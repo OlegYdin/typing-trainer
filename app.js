@@ -1394,6 +1394,7 @@
           '<span class="cell-sub">' + colLabels[c] + '</span>' +
           '</div>';
       }
+      html += '</div>';
     }
     html += '</div>';
     lettersGrid.innerHTML = html;
