@@ -635,6 +635,7 @@
       courseTheoryRead: false,
       courseDataVersion: 4,
       courseLevelCompleted: -1,
+      courseShowingWords: false,
     };
   }
 
@@ -985,6 +986,7 @@
     }
 
     // Show step selector
+    c.courseShowingWords = false;
     renderCourseStepSelector();
 
     // Show theory first if not read
@@ -1061,17 +1063,62 @@
     renderCourseExercise();
   }
 
+  function renderCourseWordList() {
+    const unit = getCurrentUnit();
+    const c = cur();
+    c.courseShowingWords = true;
+    const allPairs = [];
+    const seen = {};
+    for (let bi = 0; bi < unit.blocks.length; bi++) {
+      const pool = unit.blocks[bi].pool || [];
+      for (let pi = 0; pi < pool.length; pi++) {
+        const ex = pool[pi];
+        // Extract individual English words and try to pair with Russian
+        const engWords = ex.answer.split(/\s+/).filter(w => w.length > 0);
+        const rusWords = ex.prompt.split(/\s+/).filter(w => w.length > 0);
+        for (let wi = 0; wi < engWords.length; wi++) {
+          const key = engWords[wi].replace(/[^a-zA-Z]/g, '').toLowerCase();
+          if (key && !seen[key]) {
+            seen[key] = true;
+            const rus = rusWords[wi] || '';
+            allPairs.push({ eng: engWords[wi], rus: rus });
+          }
+        }
+      }
+    }
+    allPairs.sort(function (a, b) { return a.eng.toLowerCase().localeCompare(b.eng.toLowerCase()); });
+
+    courseTheory.style.display = 'none';
+    courseTheoryBtn.style.display = 'none';
+    courseCountSelector.style.display = 'none';
+    courseQuestion.style.display = 'none';
+    courseFeedback.style.display = 'none';
+    courseInput.style.display = 'none';
+    courseSubmit.style.display = 'none';
+    courseNext.style.display = 'none';
+    courseWords.style.display = 'none';
+    courseProgress.style.display = 'none';
+
+    let html = '<div class="course-word-list"><div style="font-size:0.85rem;opacity:0.5;margin-bottom:8px">Изучение слов — всего ' + allPairs.length + '</div>';
+    for (let i = 0; i < allPairs.length; i++) {
+      html += '<div class="word-pair"><span class="word-eng">' + allPairs[i].eng + '</span> <span class="word-rus">' + allPairs[i].rus + '</span></div>';
+    }
+    html += '</div>';
+    courseQuestion.innerHTML = html;
+    courseQuestion.style.display = '';
+  }
+
   function renderCourseStepSelector() {
     if (!isCourseMode()) { courseStepSelector.style.display = 'none'; return; }
     const block = getCurrentBlock();
     const c = cur();
-    const steps = ['Правила', 'Перевод', 'Сборка', 'Вставка', 'Выбор формы'];
-    const blockMap = [-1, 0, 1, 2, 3];
+    const steps = ['Правила', 'Слова', 'Сборка', 'Вставка', 'Выбор формы'];
+    const blockMap = [-1, -2, 0, 1, 2];
     let html = '';
     for (let si = 0; si < steps.length; si++) {
       const isTheory = si === 0;
       const stepBlock = blockMap[si];
-      const isActive = isTheory ? (!c.courseTheoryRead) : (block && c.courseBlock === stepBlock);
+      const isActive = isTheory ? (!c.courseTheoryRead) : (stepBlock === -2 ? c.courseShowingWords : (block && c.courseBlock === stepBlock));
       const cls = isActive ? 'course-step-btn active' : 'course-step-btn';
       html += '<button class="' + cls + '" data-step="' + stepBlock + '">' + steps[si] + '</button>';
     }
@@ -1083,15 +1130,24 @@
         if (step === -1) {
           // Show theory
           c.courseTheoryRead = false;
+          c.courseShowingWords = false;
+          courseStepSelector.innerHTML = '';
+          renderCourseContent();
+        } else if (step === -2) {
+          // Show word list
+          c.courseBlock = 0;
+          renderCourseWordList();
+          renderCourseStepSelector();
         } else {
           c.courseBlock = step;
           c.courseBlockExIdx = 0;
           c.courseBlockPool = [];
           courseBlockPool = [];
           c.courseTheoryRead = true;
+          c.courseShowingWords = false;
+          courseStepSelector.innerHTML = '';
+          renderCourseContent();
         }
-        courseStepSelector.innerHTML = '';
-        renderCourseContent();
       });
     });
   }

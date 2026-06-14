@@ -1094,6 +1094,33 @@ header h1 {
   color: var(--correct);
 }
 
+.course-word-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  padding: 10px 0;
+  width: 100%;
+}
+.word-pair {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+.word-eng {
+  color: var(--text);
+  font-weight: 600;
+}
+.word-rus {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+}
+
 .course-question {
   font-size: 1.3rem;
   color: var(--text);
