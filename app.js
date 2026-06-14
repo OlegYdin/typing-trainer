@@ -1003,13 +1003,14 @@
         courseWords.style.display = 'none';
         courseCountSelector.style.display = 'flex';
 
-        const gridCell = getGridCell(unit.cellId);
+        const poolLen = block.pool.length;
+        const counts = [10, 20, 30].filter(function (n) { return n < poolLen; });
+        counts.push(poolLen);
+        const btnHtml = counts.map(function (n) {
+          return '<button class="btn-sm" data-count="' + n + '">' + n + '</button>';
+        }).join('');
         courseCountSelector.innerHTML = '<span style="margin-right:8px">' +
-          block.label + ' — сколько примеров:</span>' +
-          '<button class="btn-sm" data-count="10">10</button>' +
-          '<button class="btn-sm" data-count="20">20</button>' +
-          '<button class="btn-sm" data-count="30">30</button>' +
-          '<button class="btn-sm" data-count="0">Все (' + block.pool.length + ')</button>';
+          block.label + ' — сколько примеров:</span>' + btnHtml;
 
         const prevCount = c.courseBlockCount || 0;
         courseCountSelector.querySelectorAll('.btn-sm').forEach(function (btn) {
