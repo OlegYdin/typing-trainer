@@ -869,6 +869,7 @@
     courseFeedback.className = 'course-feedback';
     courseInput.value = '';
     courseInput.className = 'course-input';
+    courseInput.readOnly = false;
     courseInput.disabled = false;
     courseInput.focus();
     courseSubmit.disabled = false;
@@ -1053,7 +1054,7 @@
       courseFeedback.textContent = '✅ Верно!';
       courseFeedback.className = 'course-feedback correct';
       courseInput.className = 'course-input correct';
-      courseInput.disabled = true;
+      courseInput.readOnly = true;
       courseSubmit.disabled = true;
       courseNext.style.display = '';
       saveState();
@@ -1061,6 +1062,7 @@
       courseFeedback.innerHTML = '❌ Неверно. Правильный ответ: <strong>' + ex.answer + '</strong>';
       courseFeedback.className = 'course-feedback incorrect';
       courseInput.className = 'course-input incorrect';
+      courseInput.readOnly = false;
       courseInput.disabled = false;
       courseSubmit.disabled = false;
       courseInput.focus();
@@ -1071,7 +1073,13 @@
 
   courseSubmit.addEventListener('click', checkAnswer);
   courseInput.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') checkAnswer();
+    if (e.key === 'Enter') {
+      if (courseNext.style.display !== 'none') {
+        courseNext.click();
+      } else {
+        checkAnswer();
+      }
+    }
   });
   courseNext.addEventListener('click', function () {
     const c = cur();
