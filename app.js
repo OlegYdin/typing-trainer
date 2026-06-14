@@ -590,6 +590,25 @@
     },
   };
 
+  function initExercises() {
+    if (typeof COURSE_EXERCISES === 'undefined') return;
+    var levels = COURSE_DATA.en.levels;
+    for (var li = 0; li < levels.length; li++) {
+      var units = levels[li].units;
+      for (var ui = 0; ui < units.length; ui++) {
+        var unit = units[ui];
+        var blocks = unit.blocks;
+        for (var bi = 0; bi < blocks.length; bi++) {
+          var block = blocks[bi];
+          var key = unit.cellId + '-' + block.type;
+          if (COURSE_EXERCISES[key]) {
+            block.pool = COURSE_EXERCISES[key];
+          }
+        }
+      }
+    }
+  }
+
   function getDefaultPerLang(lang) {
     return {
       unlockedCount: LANG_DATA[lang].initialUnlocked,
@@ -2018,6 +2037,7 @@
   }
 
   function init() {
+    initExercises();
     var ver = document.getElementById('appVersion');
     if (ver) ver.textContent = APP_VERSION;
     try {
