@@ -382,20 +382,20 @@
                 {
                   type: 'build', label: 'Сборка',
                   pool: [
-                    { prompt: 'I / work / every day', answer: 'I work every day' },
-                    { prompt: 'He / read / books', answer: 'He reads books' },
-                    { prompt: 'She / write / a letter', answer: 'She writes a letter' },
-                    { prompt: 'They / play / football', answer: 'They play football' },
-                    { prompt: 'We / live / in London', answer: 'We live in London' },
-                    { prompt: 'You / speak / English', answer: 'You speak English' },
-                    { prompt: 'The cat / sleep / on the sofa', answer: 'The cat sleeps on the sofa' },
-                    { prompt: 'The dog / run / in the park', answer: 'The dog runs in the park' },
-                    { prompt: 'The sun / shine / brightly', answer: 'The sun shines brightly' },
-                    { prompt: 'She / cook / dinner', answer: 'She cooks dinner' },
-                    { prompt: 'He / drive / a car', answer: 'He drives a car' },
-                    { prompt: 'We / watch / TV', answer: 'We watch TV' },
-                    { prompt: 'They / listen / to music', answer: 'They listen to music' },
-                    { prompt: 'Birds / sing / in the morning', answer: 'Birds sing in the morning' },
+                    { prompt: 'Я работаю каждый день', answer: 'I work every day' },
+                    { prompt: 'Он читает книги', answer: 'He reads books' },
+                    { prompt: 'Она пишет письмо', answer: 'She writes a letter' },
+                    { prompt: 'Они играют в футбол', answer: 'They play football' },
+                    { prompt: 'Мы живём в Лондоне', answer: 'We live in London' },
+                    { prompt: 'Ты говоришь по-английски', answer: 'You speak English' },
+                    { prompt: 'Кот спит на диване', answer: 'The cat sleeps on the sofa' },
+                    { prompt: 'Собака бегает в парке', answer: 'The dog runs in the park' },
+                    { prompt: 'Солнце светит ярко', answer: 'The sun shines brightly' },
+                    { prompt: 'Она готовит ужин', answer: 'She cooks dinner' },
+                    { prompt: 'Он водит машину', answer: 'He drives a car' },
+                    { prompt: 'Мы смотрим телевизор', answer: 'We watch TV' },
+                    { prompt: 'Они слушают музыку', answer: 'They listen to music' },
+                    { prompt: 'Птицы поют утром', answer: 'Birds sing in the morning' },
                   ],
                 },
                 {
@@ -464,17 +464,17 @@
                 {
                   type: 'build', label: 'Сборка',
                   pool: [
-                    { prompt: 'I / not work / on Sunday', answer: "I don't work on Sunday" },
-                    { prompt: 'He / not read / books', answer: "He doesn't read books" },
-                    { prompt: 'She / not write / letters', answer: "She doesn't write letters" },
-                    { prompt: 'They / not play / football', answer: "They don't play football" },
-                    { prompt: 'We / not live / in London', answer: "We don't live in London" },
-                    { prompt: 'You / not speak / French', answer: "You don't speak French" },
-                    { prompt: 'The cat / not sleep / here', answer: "The cat doesn't sleep here" },
-                    { prompt: 'The dog / not run / fast', answer: "The dog doesn't run fast" },
-                    { prompt: 'She / not cook / meat', answer: "She doesn't cook meat" },
-                    { prompt: 'He / not drive / a bus', answer: "He doesn't drive a bus" },
-                    { prompt: 'Birds / not sing / at night', answer: "Birds don't sing at night" },
+                    { prompt: 'Я не работаю в воскресенье', answer: "I don't work on Sunday" },
+                    { prompt: 'Он не читает книги', answer: "He doesn't read books" },
+                    { prompt: 'Она не пишет письма', answer: "She doesn't write letters" },
+                    { prompt: 'Они не играют в футбол', answer: "They don't play football" },
+                    { prompt: 'Мы не живём в Лондоне', answer: "We don't live in London" },
+                    { prompt: 'Ты не говоришь по-французски', answer: "You don't speak French" },
+                    { prompt: 'Кот не спит здесь', answer: "The cat doesn't sleep here" },
+                    { prompt: 'Собака не бегает быстро', answer: "The dog doesn't run fast" },
+                    { prompt: 'Она не готовит мясо', answer: "She doesn't cook meat" },
+                    { prompt: 'Он не водит автобус', answer: "He doesn't drive a bus" },
+                    { prompt: 'Птицы не поют ночью', answer: "Birds don't sing at night" },
                   ],
                 },
                 {
@@ -539,17 +539,17 @@
                 {
                   type: 'build', label: 'Сборка',
                   pool: [
-                    { prompt: 'Do / you / work / every day', answer: 'Do you work every day' },
-                    { prompt: 'Does / he / read / books', answer: 'Does he read books' },
-                    { prompt: 'Does / she / write / letters', answer: 'Does she write letters' },
-                    { prompt: 'Do / they / play / football', answer: 'Do they play football' },
-                    { prompt: 'Do / you / speak / English', answer: 'Do you speak English' },
-                    { prompt: 'Does / the cat / sleep / here', answer: 'Does the cat sleep here' },
-                    { prompt: 'Does / the dog / run / fast', answer: 'Does the dog run fast' },
-                    { prompt: 'Do / you / like / coffee', answer: 'Do you like coffee' },
-                    { prompt: 'Does / she / cook / dinner', answer: 'Does she cook dinner' },
-                    { prompt: 'Does / he / drive / a car', answer: 'Does he drive a car' },
-                    { prompt: 'Do / birds / sing / in the morning', answer: 'Do birds sing in the morning' },
+                    { prompt: 'Ты работаешь каждый день?', answer: 'Do you work every day' },
+                    { prompt: 'Он читает книги?', answer: 'Does he read books' },
+                    { prompt: 'Она пишет письма?', answer: 'Does she write letters' },
+                    { prompt: 'Они играют в футбол?', answer: 'Do they play football' },
+                    { prompt: 'Ты говоришь по-английски?', answer: 'Do you speak English' },
+                    { prompt: 'Кот спит здесь?', answer: 'Does the cat sleep here' },
+                    { prompt: 'Собака бегает быстро?', answer: 'Does the dog run fast' },
+                    { prompt: 'Ты любишь кофе?', answer: 'Do you like coffee' },
+                    { prompt: 'Она готовит ужин?', answer: 'Does she cook dinner' },
+                    { prompt: 'Он водит машину?', answer: 'Does he drive a car' },
+                    { prompt: 'Птицы поют утром?', answer: 'Do birds sing in the morning' },
                   ],
                 },
                 {
@@ -837,11 +837,8 @@
       html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
     }
 
-    // Word chips as hints
-    if (block.type === 'build' && !hidePrompt) {
-      const words = ex.prompt.split(/\s*\/\s*/);
-      courseWords.innerHTML = words.map(w => '<span class="course-word-chip">' + w + '</span>').join(' ');
-    } else if (block.type !== 'build' && !hidePrompt) {
+    // Word chips as hints (from answer for all types)
+    if (!hidePrompt) {
       const words = ex.answer.split(/\s+/).filter(w => w.length > 0);
       const unique = [];
       const seen = {};
