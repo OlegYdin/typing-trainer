@@ -822,29 +822,48 @@
 
     // Build question display
     let html = '';
+    const hidePrompt = c.courseHidePrompt || false;
     if (block.type === 'translate') {
       html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Переведи на английский</div>';
       html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
     } else if (block.type === 'build') {
-      const hidePrompt = c.courseHidePrompt || false;
       if (hidePrompt) {
         html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Собери предложение</div>';
         html += '<div style="font-size:1.5rem">Соберите предложение из слов</div>';
-        courseWords.innerHTML = '';
       } else {
         html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Собери предложение</div>';
         html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
-        // Show word chips
-        const words = ex.prompt.split(/\s*\/\s*/);
-        courseWords.innerHTML = words.map(w => '<span class="course-word-chip">' + w + '</span>').join(' ');
       }
     } else if (block.type === 'fill_gap') {
       html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Вставь пропущенное слово</div>';
       html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
-      courseWords.innerHTML = '';
     } else if (block.type === 'choice') {
       html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Выбери правильную форму</div>';
       html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
+    }
+
+    // Word chips as hints
+    if (block.type === 'build' && !hidePrompt) {
+      const words = ex.prompt.split(/\s*\/\s*/);
+      courseWords.innerHTML = words.map(w => '<span class="course-word-chip">' + w + '</span>').join(' ');
+    } else if (block.type !== 'build' && !hidePrompt) {
+      const words = ex.answer.split(/\s+/).filter(w => w.length > 0);
+      const unique = [];
+      const seen = {};
+      for (const w of words) {
+        const key = w.replace(/[.,!?;:'"()\[\]{}\-]/g, '').toLowerCase();
+        if (key && !seen[key]) {
+          seen[key] = true;
+          unique.push(w);
+        }
+      }
+      if (unique.length > 1) {
+        const shuffled = shuffleArr(unique.slice());
+        courseWords.innerHTML = shuffled.map(w => '<span class="course-word-chip">' + w + '</span>').join(' ');
+      } else {
+        courseWords.innerHTML = '';
+      }
+    } else {
       courseWords.innerHTML = '';
     }
 
@@ -1077,12 +1096,7 @@
     const c = cur();
     c.courseHidePrompt = courseHidePromptChk.checked;
     saveState();
-    // Re-render current exercise to apply hide/show
-    const unit = getCurrentUnit();
-    const block = getCurrentBlock();
-    if (unit && block && block.type === 'build') {
-      renderCourseExercise();
-    }
+    renderCourseExercise();
   });
   courseIgnoreCaseQuick.addEventListener('change', function () {
     state.courseIgnoreCase = courseIgnoreCaseQuick.checked;
