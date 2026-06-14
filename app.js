@@ -1389,15 +1389,32 @@
             tree += '\n├─ ' + (bi + 1) + '. ' + b.label + ' (' + b.pool.length + ')';
           }
         }
-        html += '<div class="course-grid-cell ' + status + '" title="' + tree.replace(/"/g, '&quot;') + '">' +
+        html += '<div class="course-grid-cell ' + status + '" data-tree="' + tree.replace(/"/g, '&quot;') + '">' +
           '<span class="cell-label">' + rowLabels[r] + '</span>' +
           '<span class="cell-sub">' + colLabels[c] + '</span>' +
           '</div>';
       }
-      html += '</div>';
     }
     html += '</div>';
     lettersGrid.innerHTML = html;
+    // Tooltip on hover via data-tree (clean up old tooltip first)
+    var oldTooltip = document.querySelector('.course-grid-tooltip');
+    if (oldTooltip) oldTooltip.parentNode.removeChild(oldTooltip);
+    var tooltipEl = document.createElement('div');
+    tooltipEl.className = 'course-grid-tooltip';
+    tooltipEl.style.cssText = 'display:none;position:fixed;background:#1a1a2e;color:#ccc;font-size:0.7rem;line-height:1.6;white-space:pre;padding:8px 12px;border-radius:8px;border:1px solid #333;box-shadow:0 4px 16px rgba(0,0,0,0.6);z-index:10000;pointer-events:none;font-family:Segoe UI,sans-serif';
+    document.body.appendChild(tooltipEl);
+    lettersGrid.querySelectorAll('.course-grid-cell').forEach(function (cell) {
+      cell.addEventListener('mouseenter', function (e) {
+        var tree = cell.getAttribute('data-tree');
+        if (tree) { tooltipEl.textContent = tree; tooltipEl.style.display = 'block'; }
+      });
+      cell.addEventListener('mousemove', function (e) {
+        tooltipEl.style.left = (e.clientX + 12) + 'px';
+        tooltipEl.style.top = (e.clientY - 10) + 'px';
+      });
+      cell.addEventListener('mouseleave', function () { tooltipEl.style.display = 'none'; });
+    });
   }
 
   function renderKeyboard() {
