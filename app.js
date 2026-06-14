@@ -1953,6 +1953,18 @@
     langSelect.addEventListener('change', switchLanguage);
     updateCourseDisplay();
     newTextBtn.addEventListener('click', function () {
+      if (isCourseMode()) {
+        // В режиме курса — перейти к следующему упражнению
+        if (courseNext.style.display !== 'none') {
+          courseNext.click();
+        } else {
+          const c = cur();
+          c.courseBlockExIdx++;
+          saveState();
+          renderCourseContent();
+        }
+        return;
+      }
       if (isActive && currentIndex > 0 && !isComplete) {
         if (!confirm('Начать новый текст? Текущий прогресс будет потерян.')) return;
       }
