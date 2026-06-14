@@ -1003,14 +1003,13 @@
         courseWords.style.display = 'none';
         courseCountSelector.style.display = 'flex';
 
-        const poolLen = block.pool.length;
-        const counts = [10, 20, 30].filter(function (n) { return n < poolLen; });
-        counts.push(poolLen);
-        const btnHtml = counts.map(function (n) {
-          return '<button class="btn-sm" data-count="' + n + '">' + n + '</button>';
-        }).join('');
+        const gridCell = getGridCell(unit.cellId);
         courseCountSelector.innerHTML = '<span style="margin-right:8px">' +
-          block.label + ' — сколько примеров:</span>' + btnHtml;
+          block.label + ' — сколько примеров:</span>' +
+          '<button class="btn-sm" data-count="10">10</button>' +
+          '<button class="btn-sm" data-count="20">20</button>' +
+          '<button class="btn-sm" data-count="30">30</button>' +
+          '<button class="btn-sm" data-count="0">Все (' + block.pool.length + ')</button>';
 
         const prevCount = c.courseBlockCount || 0;
         courseCountSelector.querySelectorAll('.btn-sm').forEach(function (btn) {
@@ -1041,13 +1040,20 @@
     if (!block) return;
 
     const pool = block.pool;
-    const count = chosenCount === 0 ? pool.length : Math.min(chosenCount, pool.length);
+    const count = chosenCount === 0 ? pool.length : chosenCount;
 
     c.courseBlockCount = chosenCount;
-    const shuffled = shuffleArr(pool.slice()).slice(0, count);
-    courseBlockPool = shuffled;
-    c.courseBlockPool = shuffled;
-    c.courseBlockExOrder = shuffled.map(function (_, i) { return i; });
+    const shuffled = shuffleArr(pool.slice());
+    const selected = [];
+    while (selected.length < count) {
+      for (const ex of shuffled) {
+        if (selected.length >= count) break;
+        selected.push(ex);
+      }
+    }
+    courseBlockPool = selected;
+    c.courseBlockPool = selected;
+    c.courseBlockExOrder = selected.map(function (_, i) { return i; });
     c.courseBlockExIdx = 0;
     c.courseBlockExIdx = 0;
     saveState();
