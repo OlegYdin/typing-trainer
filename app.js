@@ -747,6 +747,7 @@
   const sideCardLabel = document.getElementById('sideCardLabel');
   const sideCardSub = document.getElementById('sideCardSub');
   const sidePanel = document.querySelector('.side-panel');
+  const lessonStat = document.getElementById('lessonStat');
 
   function populateLangSelect(courseOnly) {
     langSelect.innerHTML = '';
@@ -1406,6 +1407,7 @@
       const done = block ? Math.min(cur().courseBlockExIdx + 1, block.pool.length) : 0;
       lessonDisplay.textContent = done + '/' + total;
       streakDisplay.textContent = '';
+      lessonStat.style.display = 'none';
       speedStat.style.display = 'none';
       accuracyStat.style.display = 'none';
       streakStat.style.display = 'none';
@@ -1418,6 +1420,7 @@
     } else {
       lessonDisplay.textContent = cur().lessonsDone + '/' + state.dailyGoal;
       streakDisplay.textContent = cur().consecutivePasses + '/' + state.consecutiveReq;
+      lessonStat.style.display = '';
       speedStat.style.display = '';
       accuracyStat.style.display = '';
       streakStat.style.display = '';
