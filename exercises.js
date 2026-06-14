@@ -172,7 +172,9 @@
     'a flat': 'квартире', 'at night': 'ночью', 'a bus': 'автобус',
     'on Sunday': 'в воскресенье', 'French': 'по-французски', 'here': 'здесь',
     'meat': 'мясо', 'horror films': 'фильмы ужасов', 'loud music': 'громкую музыку',
-    'the window': 'окно', 'a uniform': 'форму', 'milk': 'молоко', 'soda': 'газировку' };
+    'the window': 'окно', 'a uniform': 'форму', 'milk': 'молоко', 'soda': 'газировку',
+    'to people': 'людям', 'to friends': 'друзьям',
+    'to the radio': 'радио' };
 
   function makeRuPrompt(s, v, o) {
     var rs = ruSub[s] || s;
@@ -192,6 +194,20 @@
           break;
         }
       }
+    }
+    // speak/talk need preposition before people — exclude direct people objects
+    if (v === 'speak' || v === 'talk') {
+      result = result.filter(function (o) {
+        return o !== 'people' && o !== 'friends' && o !== 'children';
+      });
+      result.push('to people', 'to friends', 'on the phone');
+    }
+    // listen needs "to" before object
+    if (v === 'listen') {
+      result = result.map(function (o) {
+        if (o === 'the radio' || o === 'music') return 'to ' + o;
+        return o;
+      });
     }
     return result;
   }
