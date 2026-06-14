@@ -629,6 +629,7 @@
       textLength: 50,
       uiScale: 100,
       sessionTimeout: 30,
+      showKeyboard: true,
       courseIgnoreCase: true,
       courseIgnorePunct: true,
     };
@@ -700,6 +701,8 @@
   const textLengthInput = document.getElementById('textLengthInput');
   const scaleInput = document.getElementById('scaleInput');
   const scaleLabel = document.getElementById('scaleLabel');
+  const keyboardToggle = document.getElementById('keyboardToggle');
+  const showKeyboardChk = document.getElementById('showKeyboardChk');
   const authOverlay = document.getElementById('authOverlay');
   const authNameInput = document.getElementById('authNameInput');
   const authPhraseInput = document.getElementById('authPhraseInput');
@@ -1831,6 +1834,7 @@
     sessionTimeoutInput.value = state.sessionTimeout || 30;
     courseIgnoreCaseChk.checked = state.courseIgnoreCase !== false;
     courseIgnorePunctChk.checked = state.courseIgnorePunct !== false;
+    showKeyboardChk.checked = state.showKeyboard !== false;
     settingsOverlay.classList.remove('hidden');
   }
 
@@ -1844,6 +1848,7 @@
     state.sessionTimeout = Math.max(1, parseInt(sessionTimeoutInput.value) || 30);
     state.courseIgnoreCase = courseIgnoreCaseChk.checked;
     state.courseIgnorePunct = courseIgnorePunctChk.checked;
+    state.showKeyboard = showKeyboardChk.checked;
     applyScale(state.uiScale);
     saveState();
     updateStats();
@@ -2012,6 +2017,22 @@
     scaleInput.addEventListener('input', function () {
       scaleLabel.textContent = scaleInput.value + '%';
     });
+    (function setupKeyboardToggle() {
+      const kbSection = keyboard.closest('.keyboard-section') || keyboard.parentElement;
+      function applyKeyboardVisibility(show) {
+        state.showKeyboard = show;
+        kbSection.classList.toggle('hidden', !show);
+        keyboardToggle.checked = show;
+        showKeyboardChk.checked = show;
+      }
+      keyboardToggle.addEventListener('change', function () {
+        applyKeyboardVisibility(keyboardToggle.checked);
+      });
+      showKeyboardChk.addEventListener('change', function () {
+        applyKeyboardVisibility(showKeyboardChk.checked);
+      });
+      applyKeyboardVisibility(state.showKeyboard !== false);
+    })();
     applyScale(state.uiScale || 100);
     if (authCurrentUser && authUsers[authCurrentUser]) {
       switchUserBtn.textContent = '👤 ' + authCurrentUser;
