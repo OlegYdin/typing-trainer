@@ -762,6 +762,7 @@
   const lastResultCard = document.getElementById('lastResultCard');
   const courseProgress = document.getElementById('courseProgress');
   const courseProgressBar = document.getElementById('courseProgressBar');
+  const courseStepSelector = document.getElementById('courseStepSelector');
   const courseProgressText = document.getElementById('courseProgressText');
   const sideCardTitle = document.getElementById('sideCardTitle');
   const sideCardLabel = document.getElementById('sideCardLabel');
@@ -983,6 +984,9 @@
       return;
     }
 
+    // Show step selector
+    renderCourseStepSelector();
+
     // Show theory first if not read
     if (!c.courseTheoryRead) {
       courseProgress.style.display = 'none';
@@ -1004,6 +1008,7 @@
       theoryHtml += unit.theory;
       courseTheory.innerHTML = theoryHtml;
       courseTheoryBtn.style.display = '';
+      renderCourseStepSelector();
       return;
     }
 
@@ -1040,6 +1045,7 @@
             startCourseBlock(chosen);
           });
         });
+        renderCourseStepSelector();
         return;
       }
     }
@@ -1053,6 +1059,41 @@
     courseSubmit.style.display = '';
     courseWords.style.display = '';
     renderCourseExercise();
+  }
+
+  function renderCourseStepSelector() {
+    if (!isCourseMode()) { courseStepSelector.style.display = 'none'; return; }
+    const block = getCurrentBlock();
+    const c = cur();
+    const steps = ['Правила', 'Перевод', 'Сборка', 'Вставка', 'Выбор формы'];
+    const blockMap = [-1, 0, 1, 2, 3];
+    let html = '';
+    for (let si = 0; si < steps.length; si++) {
+      const isTheory = si === 0;
+      const stepBlock = blockMap[si];
+      const isActive = isTheory ? (!c.courseTheoryRead) : (block && c.courseBlock === stepBlock);
+      const cls = isActive ? 'course-step-btn active' : 'course-step-btn';
+      html += '<button class="' + cls + '" data-step="' + stepBlock + '">' + steps[si] + '</button>';
+    }
+    courseStepSelector.innerHTML = html;
+    courseStepSelector.style.display = 'flex';
+    courseStepSelector.querySelectorAll('.course-step-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const step = parseInt(this.dataset.step, 10);
+        if (step === -1) {
+          // Show theory
+          c.courseTheoryRead = false;
+        } else {
+          c.courseBlock = step;
+          c.courseBlockExIdx = 0;
+          c.courseBlockPool = [];
+          courseBlockPool = [];
+          c.courseTheoryRead = true;
+        }
+        courseStepSelector.innerHTML = '';
+        renderCourseContent();
+      });
+    });
   }
 
   function startCourseBlock(chosenCount) {
