@@ -1291,8 +1291,8 @@
     const level = getCurrentLevel();
     if (!level) return;
     const cells = COURSE_DATA[state.language].gridCells;
-    const rowLabels = ['Present Simple', 'Past Simple', 'Future Simple'];
-    const colLabels = ['Утверждение', 'Отрицание', 'Вопрос'];
+    const rowLabels = ['Present', 'Past', 'Future'];
+    const colLabels = ['утв.', 'отр.', 'вопр.'];
 
     let html = '<div class="course-grid">';
     for (let r = 0; r < 3; r++) {
