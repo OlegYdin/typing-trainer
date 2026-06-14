@@ -1570,6 +1570,7 @@
         perLang.courseBlockPool = [];
         perLang.courseBlockExOrder = [];
         perLang.courseBlockExIdx = 0;
+        perLang.courseBlock = 0;
       }
     }
     delete authUsers[username]._first;
@@ -1909,6 +1910,7 @@
             pl.courseBlockPool = [];
             pl.courseBlockExOrder = [];
             pl.courseBlockExIdx = 0;
+            pl.courseBlock = 0;
           }
         }
       }
