@@ -612,6 +612,7 @@
       courseBlockCount: 0,
       courseHidePrompt: false,
       courseTheoryRead: false,
+      courseDataVersion: 1,
     };
   }
 
@@ -1560,18 +1561,21 @@
   function loginAsUser(username) {
     authCurrentUser = username;
     if (!authUsers[username]) return;
-    state = ensureStateStructure(authUsers[username].state);
+    const rawState = authUsers[username].state;
+    const rawLang = rawState ? rawState.language || 'en' : 'en';
+    const hadCourseDataVersion = rawState && rawState[rawLang] &&
+      rawState[rawLang].courseDataVersion !== undefined;
+    state = ensureStateStructure(rawState);
     authUsers[username].state = state;
-    // Migration: clear stale course pool if prompts contain old build format
-    const perLang = state[state.language];
-    if (perLang && perLang.courseBlockPool && perLang.courseBlockPool.length) {
-      const first = perLang.courseBlockPool[0];
-      if (first && typeof first.prompt === 'string' && first.prompt.indexOf('/') !== -1) {
-        perLang.courseBlockPool = [];
-        perLang.courseBlockExOrder = [];
-        perLang.courseBlockExIdx = 0;
-        perLang.courseBlock = 0;
-      }
+    // Migration: reset course progress if courseDataVersion was missing (stale data)
+    const perLang = state[rawLang];
+    if (!hadCourseDataVersion && perLang && perLang.courseBlock > 0) {
+      perLang.courseBlock = 0;
+      perLang.courseUnit = 0;
+      perLang.courseTheoryRead = false;
+      perLang.courseBlockExIdx = 0;
+      perLang.courseBlockExOrder = [];
+      perLang.courseBlockPool = [];
     }
     delete authUsers[username]._first;
     saveState();
@@ -1897,8 +1901,8 @@
       state = getDefaultState();
     }
     if (!state) { console.error('state is falsy, using default'); state = getDefaultState(); }
-    // Migration: clear stale course pool with old build prompts
-    (function migrateCoursePool(s) {
+    // Migration: reset course progress after COURSE_DATA changes
+    (function migrateCourseData(s) {
       for (const lang of Object.keys(s)) {
         if (lang === 'language' || lang === 'dailyGoal' || lang === 'consecutiveReq' ||
             lang === 'speedReq' || lang === 'accuracyReq' || lang === 'courseIgnoreCase' ||
@@ -1911,7 +1915,17 @@
             pl.courseBlockExOrder = [];
             pl.courseBlockExIdx = 0;
             pl.courseBlock = 0;
+            pl.courseUnit = 0;
+            pl.courseTheoryRead = false;
+            pl.courseDataVersion = 1;
           }
+        }
+        if (!pl.courseDataVersion) {
+          pl.courseDataVersion = 1;
+          pl.courseBlock = 0;
+          pl.courseBlockExIdx = 0;
+          pl.courseBlockExOrder = [];
+          pl.courseBlockPool = [];
         }
       }
     })(state);
