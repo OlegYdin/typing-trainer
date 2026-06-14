@@ -634,6 +634,7 @@
       courseHidePrompt: false,
       courseTheoryRead: false,
       courseDataVersion: 4,
+      courseLevelCompleted: -1,
     };
   }
 
@@ -940,7 +941,8 @@
     }
 
     if (!unit) {
-      // No more units in this level — next level
+      // No more units in this level — mark completed, go to next level
+      if (c.courseLevel > c.courseLevelCompleted) c.courseLevelCompleted = c.courseLevel;
       c.courseLevel++;
       c.courseUnit = 0;
       c.courseBlock = 0;
@@ -1270,9 +1272,42 @@
       nextLetter.textContent = '';
       nextLetterHint.style.display = 'none';
       const level = getCurrentLevel();
-      sideCardLabel.textContent = level ? (level.id + ' · ' + level.name) : 'Курс';
-      sideCardLabel.title = 'Нажмите для смены уровня';
-      sideCardLabel.style.cursor = 'pointer';
+      const c = cur();
+      const allLevels = COURSE_DATA[state.language].levels;
+      let selHtml = '<select id="courseLevelSelect" style="background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:2px 4px;font-size:0.8rem;max-width:100%">';
+      for (let li = 0; li < allLevels.length; li++) {
+        const lv = allLevels[li];
+        const completed = li <= c.courseLevelCompleted;
+        const current = li === c.courseLevel;
+        const locked = li > c.courseLevelCompleted + 1;
+        const prefix = completed ? '✓ ' : (current ? '▶ ' : '🔒 ');
+        selHtml += '<option value="' + li + '"' +
+          (current ? ' selected' : '') +
+          (locked ? ' disabled' : '') +
+          '>' + prefix + lv.id + ' · ' + lv.name + '</option>';
+      }
+      selHtml += '</select>';
+      sideCardLabel.innerHTML = selHtml;
+      const sel = sideCardLabel.querySelector('#courseLevelSelect');
+      if (sel) {
+        sel.addEventListener('change', function () {
+          const newLevel = parseInt(sel.value, 10);
+          if (newLevel === c.courseLevel) return;
+          if (newLevel > c.courseLevelCompleted + 1) return;
+          c.courseLevel = newLevel;
+          c.courseUnit = 0;
+          c.courseBlock = 1;
+          c.courseBlockExIdx = 0;
+          c.courseBlockPool = [];
+          c.courseTheoryRead = false;
+          courseBlockPool = [];
+          saveState();
+          renderLetters();
+          renderCourseContent();
+        });
+      }
+      sideCardLabel.title = '';
+      sideCardLabel.style.cursor = '';
       sideCardSub.style.display = 'none';
       sidePanel.classList.add('course-active');
       renderCourseGrid();
@@ -1732,6 +1767,10 @@
       perLang.courseBlockPool = [];
       perLang.courseDataVersion = 4;
     }
+    // Auto-set courseLevelCompleted for existing users
+    if (perLang && perLang.courseLevelCompleted === -1 && perLang.courseLevel > 0) {
+      perLang.courseLevelCompleted = perLang.courseLevel - 1;
+    }
     delete authUsers[username]._first;
     saveState();
     hideAuthOverlay();
@@ -2137,22 +2176,7 @@
       }
       toggleCourseMode();
     });
-    sideCardLabel.addEventListener('click', function () {
-      if (!isCourseMode()) return;
-      const c = cur();
-      const levels = COURSE_DATA[state.language].levels;
-      if (!levels || levels.length < 2) return;
-      c.courseLevel = (c.courseLevel + 1) % levels.length;
-      c.courseUnit = 0;
-      c.courseBlock = 1;
-      c.courseBlockExIdx = 0;
-      c.courseBlockPool = [];
-      c.courseTheoryRead = false;
-      courseBlockPool = [];
-      saveState();
-      renderLetters();
-      renderCourseContent();
-    });
+    switchUserBtn.addEventListener('click', switchUser);
     modalOverlay.addEventListener('click', function (e) {
       if (e.target === modalOverlay) hideModal();
     });
