@@ -354,6 +354,51 @@ header h1 {
   min-height: 1.4em;
 }
 
+.course-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+.course-grid-row {
+  display: flex;
+  gap: 4px;
+}
+.course-grid-cell {
+  flex: 1;
+  padding: 6px 4px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 0.7rem;
+  line-height: 1.3;
+  border: 2px solid transparent;
+  cursor: default;
+  background: var(--locked);
+  color: var(--text-dim);
+  opacity: 0.4;
+}
+.course-grid-cell.completed {
+  background: rgba(74, 222, 128, 0.2);
+  color: var(--correct);
+  border-color: rgba(74, 222, 128, 0.3);
+  opacity: 1;
+}
+.course-grid-cell.current {
+  background: rgba(108, 99, 255, 0.2);
+  color: var(--accent);
+  border-color: var(--accent);
+  opacity: 1;
+}
+.course-grid-cell .cell-label {
+  font-weight: 600;
+  display: block;
+}
+.course-grid-cell .cell-sub {
+  font-size: 0.6rem;
+  opacity: 0.7;
+  display: block;
+}
+
 .letters-grid {
   display: flex;
   flex-wrap: wrap;
@@ -971,6 +1016,31 @@ header h1 {
   flex-direction: column;
   gap: 16px;
   align-items: center;
+}
+
+.course-progress {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.course-progress-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.course-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.course-progress-text {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  white-space: nowrap;
 }
 
 .course-question {

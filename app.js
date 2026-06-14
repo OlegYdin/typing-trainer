@@ -735,6 +735,17 @@
   const courseTheoryBtn = document.getElementById('courseTheoryBtn');
   const courseCountSelector = document.getElementById('courseCountSelector');
   const courseHidePromptChk = document.getElementById('courseHidePrompt');
+  const speedStat = document.getElementById('speedStat');
+  const accuracyStat = document.getElementById('accuracyStat');
+  const targetSpeedItem = document.getElementById('targetSpeedItem');
+  const targetAccuracyItem = document.getElementById('targetAccuracyItem');
+  const lastResultCard = document.getElementById('lastResultCard');
+  const courseProgress = document.getElementById('courseProgress');
+  const courseProgressBar = document.getElementById('courseProgressBar');
+  const courseProgressText = document.getElementById('courseProgressText');
+  const sideCardTitle = document.getElementById('sideCardTitle');
+  const sideCardLabel = document.getElementById('sideCardLabel');
+  const sideCardSub = document.getElementById('sideCardSub');
 
   function populateLangSelect(courseOnly) {
     langSelect.innerHTML = '';
@@ -883,6 +894,10 @@
     courseIgnoreCaseQuick.checked = state.courseIgnoreCase !== false;
     courseIgnorePunctQuick.checked = state.courseIgnorePunct !== false;
     courseHidePromptChk.checked = c.courseHidePrompt || false;
+    // Update progress bar
+    courseProgress.style.display = 'flex';
+    courseProgressBar.style.width = ((idx + 1) / exs.length * 100) + '%';
+    courseProgressText.textContent = (idx + 1) + '/' + exs.length;
     updateStats();
     updateCourseDisplay();
   }
@@ -946,6 +961,7 @@
 
     // Show theory first if not read
     if (!c.courseTheoryRead) {
+      courseProgress.style.display = 'none';
       courseQuestion.style.display = 'none';
       courseInput.style.display = 'none';
       courseSubmit.style.display = 'none';
@@ -972,6 +988,7 @@
       if (c.courseBlockPool && c.courseBlockPool.length) {
         courseBlockPool = c.courseBlockPool;
       } else {
+        courseProgress.style.display = 'none';
         courseTheory.style.display = 'none';
         courseTheoryBtn.style.display = 'none';
         courseQuestion.style.display = 'none';
@@ -1216,16 +1233,20 @@
     lettersGrid.innerHTML = '';
     if (isCourseMode()) {
       lettersGrid.classList.remove('compact');
-      lettersGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-dim);font-size:0.9rem;padding:20px">📚 Уровень ' + getCurrentLevel()?.id + '</div>';
       unlockedCount.textContent = '';
       totalCount.textContent = '';
       nextLetter.textContent = '';
       nextLetterHint.style.display = 'none';
+      sideCardLabel.textContent = 'Курс';
+      sideCardSub.style.display = 'none';
+      renderCourseGrid();
       return;
     }
     const order = langData().letterOrder;
     lettersGrid.classList.toggle('compact', order.length > 40);
     nextLetterHint.style.display = '';
+    sideCardLabel.textContent = 'Буквы';
+    sideCardSub.style.display = '';
     for (let i = 0; i < order.length; i++) {
       const ch = order[i];
       const tile = document.createElement('div');
@@ -1264,6 +1285,36 @@
     } else {
       nextLetter.textContent = '✓';
     }
+  }
+
+  function renderCourseGrid() {
+    const level = getCurrentLevel();
+    if (!level) return;
+    const cells = COURSE_DATA[state.language].gridCells;
+    const rowLabels = ['Present Simple', 'Past Simple', 'Future Simple'];
+    const colLabels = ['Утверждение', 'Отрицание', 'Вопрос'];
+
+    let html = '<div class="course-grid">';
+    for (let r = 0; r < 3; r++) {
+      html += '<div class="course-grid-row">';
+      for (let c = 0; c < 3; c++) {
+        const cell = cells.find(function (g) { return g.row === r && g.col === c; });
+        if (!cell) continue;
+        const unitIdx = level.units.findIndex(function (u) { return u.cellId === cell.id; });
+        let status = 'locked';
+        if (unitIdx >= 0) {
+          if (unitIdx < cur().courseUnit) status = 'completed';
+          else if (unitIdx === cur().courseUnit) status = 'current';
+        }
+        html += '<div class="course-grid-cell ' + status + '">' +
+          '<span class="cell-label">' + rowLabels[r] + '</span>' +
+          '<span class="cell-sub">' + colLabels[c] + '</span>' +
+          '</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+    lettersGrid.innerHTML = html;
   }
 
   function renderKeyboard() {
@@ -1317,15 +1368,25 @@
       const done = block ? Math.min(cur().courseBlockExIdx + 1, block.pool.length) : 0;
       lessonDisplay.textContent = done + '/' + total;
       streakDisplay.textContent = '';
+      speedStat.style.display = 'none';
+      accuracyStat.style.display = 'none';
       streakStat.style.display = 'none';
+      targetSpeedItem.style.display = 'none';
+      targetAccuracyItem.style.display = 'none';
       targetStreakItem.style.display = 'none';
+      lastResultCard.style.display = 'none';
       speedDisplay.textContent = '—';
       accuracyDisplay.textContent = '—';
     } else {
       lessonDisplay.textContent = cur().lessonsDone + '/' + state.dailyGoal;
       streakDisplay.textContent = cur().consecutivePasses + '/' + state.consecutiveReq;
+      speedStat.style.display = '';
+      accuracyStat.style.display = '';
       streakStat.style.display = '';
+      targetSpeedItem.style.display = '';
+      targetAccuracyItem.style.display = '';
       targetStreakItem.style.display = '';
+      lastResultCard.style.display = '';
     }
     if (inlineEditingTarget !== 'targetSpeed') targetSpeed.textContent = state.speedReq;
     if (inlineEditingTarget !== 'targetAccuracy') targetAccuracy.textContent = Math.round(state.accuracyReq * 100);
@@ -2091,6 +2152,7 @@
       const level = COURSE_DATA[state.language].levels[cur().courseLevel];
       modeToggleBtn.textContent = 'Тренажёр';
       mainTitle.textContent = 'Изучение языка';
+      newTextBtn.textContent = 'Далее';
       populateLangSelect(true);
       if (!COURSE_DATA[langSelect.value]) {
         langSelect.value = 'en';
@@ -2114,6 +2176,7 @@
     } else {
       modeToggleBtn.textContent = 'Курс';
       mainTitle.textContent = 'Клавиатурный тренажёр';
+      newTextBtn.textContent = 'Новый текст';
       populateLangSelect(false);
       courseLevelDisplay.style.display = 'none';
     }

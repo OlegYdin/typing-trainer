@@ -11,14 +11,14 @@
     <header>
       <h1 id="mainTitle">Клавиатурный тренажёр</h1>
       <div class="stats">
-        <div class="stat">
+        <div class="stat" id="speedStat">
           <span class="stat-icon">⚡</span>
           <div>
             <div class="stat-value" id="speedDisplay">0</div>
             <div class="stat-label">симв/мин</div>
           </div>
         </div>
-        <div class="stat">
+        <div class="stat" id="accuracyStat">
           <span class="stat-icon">🎯</span>
           <div>
             <div class="stat-value" id="accuracyDisplay">0%</div>
@@ -50,9 +50,9 @@
             <button class="mode-toggle" id="modeToggleBtn">Курс</button>
             <span class="target-item" id="courseLevelDisplay" style="display:none"></span>
             <span class="target-sep">·</span>
-            <span class="target-item">⚡ <span id="targetSpeed">200</span> симв/мин</span>
+            <span class="target-item" id="targetSpeedItem">⚡ <span id="targetSpeed">200</span> симв/мин</span>
             <span class="target-sep">·</span>
-            <span class="target-item">🎯 <span id="targetAccuracy">95</span>% точности</span>
+            <span class="target-item" id="targetAccuracyItem">🎯 <span id="targetAccuracy">95</span>% точности</span>
             <span class="target-sep">·</span>
             <span class="target-item" id="targetStreakItem">🔥 <span id="targetStreak">5</span> раз подряд</span>
           </div>
@@ -67,6 +67,12 @@
 
           <section class="course-area" id="courseArea" style="display:none">
             <div class="course-theory" id="courseTheory" style="display:none"></div>
+            <div class="course-progress" id="courseProgress" style="display:none">
+              <div class="course-progress-bar-bg">
+                <div class="course-progress-bar" id="courseProgressBar"></div>
+              </div>
+              <span class="course-progress-text" id="courseProgressText"></span>
+            </div>
             <div class="course-question" id="courseQuestion"></div>
             <div class="course-feedback" id="courseFeedback" style="display:none"></div>
             <div class="course-input-row">
@@ -134,9 +140,9 @@
           </div>
 
           <div class="side-card">
-            <div class="side-card-title">
-              Буквы
-              <span class="side-card-sub"><strong id="unlockedCount">0</strong>/<strong id="totalCount">33</strong></span>
+            <div class="side-card-title" id="sideCardTitle">
+              <span id="sideCardLabel">Буквы</span>
+              <span class="side-card-sub" id="sideCardSub"><strong id="unlockedCount">0</strong>/<strong id="totalCount">33</strong></span>
             </div>
             <div class="letters-grid" id="lettersGrid"></div>
             <div class="next-letter-hint" id="nextLetterHint">След: <span class="nl-badge" id="nextLetter">—</span></div>
