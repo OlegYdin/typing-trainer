@@ -614,7 +614,7 @@
       courseBlockCount: 0,
       courseHidePrompt: false,
       courseTheoryRead: false,
-      courseDataVersion: 2,
+      courseDataVersion: 3,
     };
   }
 
@@ -1579,16 +1579,16 @@
     const oldVersion = rawState && rawState[rawLang] ? rawState[rawLang].courseDataVersion : undefined;
     state = ensureStateStructure(rawState);
     authUsers[username].state = state;
-    // Migration: reset course progress if courseDataVersion < 2 (stale data)
+    // Migration: reset course progress if courseDataVersion < 3 (stale data)
     const perLang = state[rawLang];
-    if ((!oldVersion || oldVersion < 2) && perLang && perLang.courseBlock > 0) {
+    if ((!oldVersion || oldVersion < 3) && perLang && perLang.courseBlock > 0) {
       perLang.courseBlock = 0;
       perLang.courseUnit = 0;
       perLang.courseTheoryRead = false;
       perLang.courseBlockExIdx = 0;
       perLang.courseBlockExOrder = [];
       perLang.courseBlockPool = [];
-      perLang.courseDataVersion = 2;
+      perLang.courseDataVersion = 3;
     }
     delete authUsers[username]._first;
     saveState();
@@ -1934,12 +1934,14 @@
             pl.courseBlock = 0;
             pl.courseUnit = 0;
             pl.courseTheoryRead = false;
-            pl.courseDataVersion = 2;
+            pl.courseDataVersion = 3;
           }
         }
-        if (!pl.courseDataVersion || pl.courseDataVersion < 2) {
-          pl.courseDataVersion = 2;
+        if (!pl.courseDataVersion || pl.courseDataVersion < 3) {
+          pl.courseDataVersion = 3;
           pl.courseBlock = 0;
+          pl.courseUnit = 0;
+          pl.courseTheoryRead = false;
           pl.courseBlockExIdx = 0;
           pl.courseBlockExOrder = [];
           pl.courseBlockPool = [];
