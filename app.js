@@ -1,6 +1,8 @@
 (function () {
   'use strict';
 
+  const APP_VERSION = 'v0.0.0.10';
+
   const CODE_LETTERS = 'abcdefghijklmnopqrstuvwxyz0123456789_.()[]{}<>+-*/%=,:;\'"!?@#$&|~^\\`'.split('');
   const CODE_KEYBOARD = [
     ['`','1','2','3','4','5','6','7','8','9','0','-','='],
@@ -1902,6 +1904,8 @@
   }
 
   function init() {
+    var ver = document.getElementById('appVersion');
+    if (ver) ver.textContent = APP_VERSION;
     try {
       state = loadState();
     } catch(e) {

@@ -14,6 +14,9 @@ if (-not $last) { $last = "v0.0.0.0" }
 $parts = $last -replace 'v','' -split '\.'
 $newVer = "v{0}.{1}.{2}.{3}" -f $parts[0], $parts[1], $parts[2], ([int]$parts[3] + 1)
 
+# Обновить версию в app.js
+(Get-Content app.js) -replace "const APP_VERSION = 'v[^']+'", "const APP_VERSION = '$newVer'" | Set-Content app.js
+
 git add -A
 git commit -m $msg
 git tag $newVer

@@ -1037,6 +1037,17 @@ header h1 {
   cursor: help;
 }
 
+.app-version {
+  position: fixed;
+  bottom: 6px;
+  right: 10px;
+  font-size: 0.7rem;
+  opacity: 0.3;
+  color: var(--text);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .course-option-toggles-row {
   display: flex;
   gap: 12px;
