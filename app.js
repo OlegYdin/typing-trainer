@@ -1067,26 +1067,20 @@
     const unit = getCurrentUnit();
     const c = cur();
     c.courseShowingWords = true;
+    // Collect all unique prompt→answer pairs from all blocks
     const allPairs = [];
     const seen = {};
     for (let bi = 0; bi < unit.blocks.length; bi++) {
       const pool = unit.blocks[bi].pool || [];
       for (let pi = 0; pi < pool.length; pi++) {
         const ex = pool[pi];
-        // Extract individual English words and try to pair with Russian
-        const engWords = ex.answer.split(/\s+/).filter(w => w.length > 0);
-        const rusWords = ex.prompt.split(/\s+/).filter(w => w.length > 0);
-        for (let wi = 0; wi < engWords.length; wi++) {
-          const key = engWords[wi].replace(/[^a-zA-Z]/g, '').toLowerCase();
-          if (key && !seen[key]) {
-            seen[key] = true;
-            const rus = rusWords[wi] || '';
-            allPairs.push({ eng: engWords[wi], rus: rus });
-          }
+        const key = ex.prompt + ' ||| ' + ex.answer;
+        if (!seen[key]) {
+          seen[key] = true;
+          allPairs.push({ prompt: ex.prompt, answer: ex.answer });
         }
       }
     }
-    allPairs.sort(function (a, b) { return a.eng.toLowerCase().localeCompare(b.eng.toLowerCase()); });
 
     courseTheory.style.display = 'none';
     courseTheoryBtn.style.display = 'none';
@@ -1099,9 +1093,9 @@
     courseWords.style.display = 'none';
     courseProgress.style.display = 'none';
 
-    let html = '<div class="course-word-list"><div style="font-size:0.85rem;opacity:0.5;margin-bottom:8px">Изучение слов — всего ' + allPairs.length + '</div>';
+    let html = '<div class="course-word-list"><div style="font-size:0.85rem;opacity:0.5;margin-bottom:8px">Фразы для изучения — ' + allPairs.length + '</div>';
     for (let i = 0; i < allPairs.length; i++) {
-      html += '<div class="word-pair"><span class="word-eng">' + allPairs[i].eng + '</span> <span class="word-rus">' + allPairs[i].rus + '</span></div>';
+      html += '<div class="word-pair"><span class="word-rus">' + allPairs[i].prompt + '</span> <span class="word-arrow">→</span> <span class="word-eng">' + allPairs[i].answer + '</span></div>';
     }
     html += '</div>';
     courseQuestion.innerHTML = html;
