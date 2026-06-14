@@ -1269,7 +1269,10 @@
       totalCount.textContent = '';
       nextLetter.textContent = '';
       nextLetterHint.style.display = 'none';
-      sideCardLabel.textContent = 'Курс';
+      const level = getCurrentLevel();
+      sideCardLabel.textContent = level ? (level.id + ' · ' + level.name) : 'Курс';
+      sideCardLabel.title = 'Нажмите для смены уровня';
+      sideCardLabel.style.cursor = 'pointer';
       sideCardSub.style.display = 'none';
       sidePanel.classList.add('course-active');
       renderCourseGrid();
@@ -1279,6 +1282,8 @@
     lettersGrid.classList.toggle('compact', order.length > 40);
     nextLetterHint.style.display = '';
     sideCardLabel.textContent = 'Буквы';
+    sideCardLabel.style.cursor = '';
+    sideCardLabel.title = '';
     sideCardSub.style.display = '';
     sidePanel.classList.remove('course-active');
     for (let i = 0; i < order.length; i++) {
@@ -1340,7 +1345,16 @@
           if (unitIdx < cur().courseUnit) status = 'completed';
           else if (unitIdx === cur().courseUnit) status = 'current';
         }
-        html += '<div class="course-grid-cell ' + status + '">' +
+        // Build tree tooltip
+        let tree = level.id + ' · ' + rowLabels[r] + ' · ' + colLabels[c];
+        if (unitIdx >= 0) {
+          const unit = level.units[unitIdx];
+          for (let bi = 0; bi < unit.blocks.length; bi++) {
+            const b = unit.blocks[bi];
+            tree += '\n├─ ' + (bi + 1) + '. ' + b.label + ' (' + b.pool.length + ')';
+          }
+        }
+        html += '<div class="course-grid-cell ' + status + '" title="' + tree.replace(/"/g, '&quot;') + '">' +
           '<span class="cell-label">' + rowLabels[r] + '</span>' +
           '<span class="cell-sub">' + colLabels[c] + '</span>' +
           '</div>';
@@ -2122,6 +2136,22 @@
         if (!confirm('Переключить режим? Текущий текст будет потерян.')) return;
       }
       toggleCourseMode();
+    });
+    sideCardLabel.addEventListener('click', function () {
+      if (!isCourseMode()) return;
+      const c = cur();
+      const levels = COURSE_DATA[state.language].levels;
+      if (!levels || levels.length < 2) return;
+      c.courseLevel = (c.courseLevel + 1) % levels.length;
+      c.courseUnit = 0;
+      c.courseBlock = 1;
+      c.courseBlockExIdx = 0;
+      c.courseBlockPool = [];
+      c.courseTheoryRead = false;
+      courseBlockPool = [];
+      saveState();
+      renderLetters();
+      renderCourseContent();
     });
     modalOverlay.addEventListener('click', function (e) {
       if (e.target === modalOverlay) hideModal();
