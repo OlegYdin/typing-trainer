@@ -827,13 +827,8 @@
       html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Переведи на английский</div>';
       html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
     } else if (block.type === 'build') {
-      if (hidePrompt) {
-        html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Собери предложение</div>';
-        html += '<div style="font-size:1.5rem">Соберите предложение из слов</div>';
-      } else {
-        html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Собери предложение</div>';
-        html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
-      }
+      html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Собери предложение</div>';
+      html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
     } else if (block.type === 'fill_gap') {
       html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Вставь пропущенное слово</div>';
       html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
