@@ -2192,20 +2192,19 @@
       saveState();
     }
     const nc = cur();
-    if (!nc.courseLevel && nc.courseLevel !== 0) { nc.courseLevel = 0; nc.courseUnit = 0; nc.courseBlock = 0; nc.courseBlockExIdx = 0; nc.courseActive = true; nc.courseTheoryRead = false; }
+    if (!nc.courseLevel && nc.courseLevel !== 0) { nc.courseLevel = 0; nc.courseUnit = 0; }
     console.log('nc courseLevel:', nc.courseLevel, 'nc courseActive:', nc.courseActive);
     // Reset to first level if out of bounds (handles old saved state with different level count)
     if (nc.courseLevel >= COURSE_DATA[state.language].levels.length) {
       nc.courseLevel = 0;
       nc.courseUnit = 0;
-      nc.courseBlock = 0;
-      nc.courseBlockExIdx = 0;
-      nc.courseBlockExOrder = [];
-      nc.courseBlockPool = [];
-      nc.courseBlockCount = 0;
-      nc.courseTheoryRead = false;
     }
-    // Reset runtime state
+    // Всегда начинаем с «Сборка» (block 1), пропуская перевод
+    nc.courseBlock = 1;
+    nc.courseBlockExIdx = 0;
+    nc.courseBlockExOrder = [];
+    nc.courseBlockPool = [];
+    nc.courseTheoryRead = false;
     courseBlockPool = [];
     nc.courseActive = true;
     saveState();
