@@ -581,7 +581,7 @@ header h1 {
 
 .modal-settings {
   text-align: left;
-  max-width: 380px;
+  max-width: 460px;
 }
 
 .modal-settings h2 {
@@ -602,7 +602,7 @@ header h1 {
 .setting-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   font-size: 0.9rem;
   color: var(--text);
