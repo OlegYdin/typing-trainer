@@ -899,6 +899,7 @@
     courseProgress.style.display = 'flex';
     courseProgressBar.style.width = ((idx + 1) / exs.length * 100) + '%';
     courseProgressText.textContent = (idx + 1) + '/' + exs.length;
+    updateCourseKeyboard();
     updateStats();
     updateCourseDisplay();
   }
@@ -963,6 +964,7 @@
     // Show theory first if not read
     if (!c.courseTheoryRead) {
       courseProgress.style.display = 'none';
+      updateCourseKeyboard();
       courseQuestion.style.display = 'none';
       courseInput.style.display = 'none';
       courseSubmit.style.display = 'none';
@@ -990,6 +992,7 @@
         courseBlockPool = c.courseBlockPool;
       } else {
         courseProgress.style.display = 'none';
+        updateCourseKeyboard();
         courseTheory.style.display = 'none';
         courseTheoryBtn.style.display = 'none';
         courseQuestion.style.display = 'none';
@@ -1349,6 +1352,26 @@
         const target = keyboard.querySelector('.key[data-char="' + mapped + '"]');
         if (target) target.classList.add('current-key');
       }
+    }
+  }
+
+  function updateCourseKeyboard() {
+    const keys = keyboard.querySelectorAll('.key');
+    keys.forEach(k => k.classList.remove('course-key'));
+    if (!isCourseMode()) return;
+    const exs = courseBlockPool;
+    const idx = cur().courseBlockExIdx;
+    if (!exs || idx >= exs.length) return;
+    const answer = exs[idx].answer;
+    const chars = new Set();
+    for (const ch of answer.toLowerCase()) {
+      if (ch === ' ') continue;
+      const mapped = SHIFT_MAP[ch] || ch;
+      chars.add(mapped);
+    }
+    for (const ch of chars) {
+      const target = keyboard.querySelector('.key[data-char="' + ch + '"]');
+      if (target) target.classList.add('course-key');
     }
   }
 
@@ -2112,6 +2135,7 @@
     c.courseActive = !c.courseActive;
     if (!c.courseActive) {
       console.log('toggling OFF');
+      updateCourseKeyboard();
       saveState();
       updateCourseDisplay();
       renderText();
