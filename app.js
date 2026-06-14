@@ -746,6 +746,7 @@
   const sideCardTitle = document.getElementById('sideCardTitle');
   const sideCardLabel = document.getElementById('sideCardLabel');
   const sideCardSub = document.getElementById('sideCardSub');
+  const sidePanel = document.querySelector('.side-panel');
 
   function populateLangSelect(courseOnly) {
     langSelect.innerHTML = '';
@@ -1239,6 +1240,7 @@
       nextLetterHint.style.display = 'none';
       sideCardLabel.textContent = 'Курс';
       sideCardSub.style.display = 'none';
+      sidePanel.classList.add('course-active');
       renderCourseGrid();
       return;
     }
@@ -1247,6 +1249,7 @@
     nextLetterHint.style.display = '';
     sideCardLabel.textContent = 'Буквы';
     sideCardSub.style.display = '';
+    sidePanel.classList.remove('course-active');
     for (let i = 0; i < order.length; i++) {
       const ch = order[i];
       const tile = document.createElement('div');
@@ -1291,8 +1294,8 @@
     const level = getCurrentLevel();
     if (!level) return;
     const cells = COURSE_DATA[state.language].gridCells;
-    const rowLabels = ['Present', 'Past', 'Future'];
-    const colLabels = ['утв.', 'отр.', 'вопр.'];
+    const rowLabels = ['Present Simple', 'Past Simple', 'Future Simple'];
+    const colLabels = ['Утверждение', 'Отрицание', 'Вопрос'];
 
     let html = '<div class="course-grid">';
     for (let r = 0; r < 3; r++) {

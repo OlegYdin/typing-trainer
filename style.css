@@ -175,6 +175,9 @@ header h1 {
   position: sticky;
   top: 16px;
 }
+.side-panel.course-active {
+  width: 340px;
+}
 
 .side-card {
   background: var(--surface);
@@ -366,11 +369,11 @@ header h1 {
 }
 .course-grid-cell {
   flex: 1;
-  padding: 4px 2px;
+  padding: 6px 4px;
   border-radius: 4px;
   text-align: center;
-  font-size: 0.6rem;
-  line-height: 1.2;
+  font-size: 0.7rem;
+  line-height: 1.3;
   border: 1px solid transparent;
   cursor: default;
   background: var(--locked);
@@ -914,7 +917,7 @@ header h1 {
 
 @media (max-width: 850px) {
   .main-layout { flex-direction: column; }
-  .side-panel { width: 100%; flex-direction: row; flex-wrap: wrap; position: static; }
+  .side-panel, .side-panel.course-active { width: 100%; flex-direction: row; flex-wrap: wrap; position: static; }
   .side-card { flex: 1; min-width: 180px; }
 }
 
