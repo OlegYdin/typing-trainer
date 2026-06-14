@@ -542,6 +542,13 @@ header h1 {
   border-color: rgba(74, 222, 128, 0.5);
   box-shadow: 0 0 8px rgba(74, 222, 128, 0.2);
 }
+.key.course-key.current-key {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  transform: scale(1.05);
+  box-shadow: 0 0 16px rgba(108, 99, 255, 0.3);
+}
 
 .key.locked {
   color: var(--text-dim);

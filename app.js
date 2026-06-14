@@ -1107,6 +1107,7 @@
       }
     }
   });
+  courseInput.addEventListener('input', updateCourseKeyboard);
   courseNext.addEventListener('click', function () {
     const c = cur();
     c.courseBlockExIdx++;
@@ -1357,12 +1358,13 @@
 
   function updateCourseKeyboard() {
     const keys = keyboard.querySelectorAll('.key');
-    keys.forEach(k => k.classList.remove('course-key'));
+    keys.forEach(k => k.classList.remove('course-key', 'current-key'));
     if (!isCourseMode()) return;
     const exs = courseBlockPool;
     const idx = cur().courseBlockExIdx;
     if (!exs || idx >= exs.length) return;
     const answer = exs[idx].answer;
+    // Green highlight: all unique chars in the answer
     const chars = new Set();
     for (const ch of answer.toLowerCase()) {
       if (ch === ' ') continue;
@@ -1372,6 +1374,16 @@
     for (const ch of chars) {
       const target = keyboard.querySelector('.key[data-char="' + ch + '"]');
       if (target) target.classList.add('course-key');
+    }
+    // Blue highlight: next expected character
+    const typed = courseInput.value;
+    let nextIdx = typed.length;
+    while (nextIdx < answer.length && answer[nextIdx] === ' ') nextIdx++;
+    if (nextIdx < answer.length) {
+      const nextCh = answer[nextIdx].toLowerCase();
+      const mapped = SHIFT_MAP[nextCh] || nextCh;
+      const target = keyboard.querySelector('.key[data-char="' + mapped + '"]');
+      if (target) target.classList.add('current-key');
     }
   }
 
