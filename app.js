@@ -1562,6 +1562,16 @@
     if (!authUsers[username]) return;
     state = ensureStateStructure(authUsers[username].state);
     authUsers[username].state = state;
+    // Migration: clear stale course pool if prompts contain old build format
+    const perLang = state[state.language];
+    if (perLang && perLang.courseBlockPool && perLang.courseBlockPool.length) {
+      const first = perLang.courseBlockPool[0];
+      if (first && typeof first.prompt === 'string' && first.prompt.indexOf('/') !== -1) {
+        perLang.courseBlockPool = [];
+        perLang.courseBlockExOrder = [];
+        perLang.courseBlockExIdx = 0;
+      }
+    }
     delete authUsers[username]._first;
     saveState();
     hideAuthOverlay();
@@ -1886,6 +1896,23 @@
       state = getDefaultState();
     }
     if (!state) { console.error('state is falsy, using default'); state = getDefaultState(); }
+    // Migration: clear stale course pool with old build prompts
+    (function migrateCoursePool(s) {
+      for (const lang of Object.keys(s)) {
+        if (lang === 'language' || lang === 'dailyGoal' || lang === 'consecutiveReq' ||
+            lang === 'speedReq' || lang === 'accuracyReq' || lang === 'courseIgnoreCase' ||
+            lang === 'courseIgnorePunct' || typeof s[lang] !== 'object' || !s[lang]) continue;
+        const pl = s[lang];
+        if (pl.courseBlockPool && pl.courseBlockPool.length) {
+          const first = pl.courseBlockPool[0];
+          if (first && typeof first.prompt === 'string' && first.prompt.indexOf('/') !== -1) {
+            pl.courseBlockPool = [];
+            pl.courseBlockExOrder = [];
+            pl.courseBlockExIdx = 0;
+          }
+        }
+      }
+    })(state);
     checkDailyReset();
     totalCount.textContent = langData().letterOrder.length;
     renderKeyboard();
