@@ -941,7 +941,7 @@
     apiCall('/api/' + (isRegister ? 'register' : 'login'), { username: username.trim(), phrase: phrase, display_name: username.trim() }).then(function (res) {
       if (res.error) { showAuthError(res.error); return; }
       authToken = res.token;
-      authUser = { username: username.trim(), display_name: res.display_name };
+      authUser = { user_id: res.user_id, username: username.trim(), display_name: res.display_name };
       saveAuthToStorage();
       updateAuthUI();
       hideAuthOverlay();
@@ -1055,7 +1055,7 @@
     if (!content) return;
     content.innerHTML = '<div class="leaderboard-empty">Загрузка...</div>';
     var url = API_HOST + '/api/suggestions';
-    if (authUser) url += '?user_id=' + authUser.user_id;
+    if (authUser && authUser.user_id) url += '?user_id=' + authUser.user_id;
     fetch(url).then(function (r) { return r.json(); }).then(function (items) {
       if (!items || !items.length) {
         content.innerHTML = '<div class="leaderboard-empty">Пока нет предложений. Будьте первым!</div>';
@@ -1086,6 +1086,7 @@
   window.__voteSuggestion = function (id) {
     if (!authToken) { showAuthOverlay(); return; }
     apiCall('/api/suggestions/' + id + '/vote', { token: authToken }).then(function (res) {
+      if (res.error === 'Not authenticated') { authToken = null; authUser = null; saveAuthToStorage(); updateAuthUI(); showAuthOverlay(); return; }
       if (res.error) return;
       renderSuggestions();
     });
@@ -1121,6 +1122,7 @@
     var inp = document.getElementById('comment-input-' + id);
     if (!inp || !inp.value.trim()) return;
     apiCall('/api/suggestions/' + id + '/comments', { token: authToken, text: inp.value.trim() }).then(function (res) {
+      if (res.error === 'Not authenticated') { authToken = null; authUser = null; saveAuthToStorage(); updateAuthUI(); showAuthOverlay(); return; }
       if (res.error) return;
       inp.value = '';
       window.__toggleComments(id);
@@ -1140,11 +1142,12 @@
   }
 
   function submitSuggestion() {
-    if (!authToken) return;
+    if (!authToken) { showAuthOverlay(); return; }
     var title = document.getElementById('suggestionTitleInput').value.trim();
     var desc = document.getElementById('suggestionDescInput').value.trim();
     if (!title) { alert('Введите заголовок'); return; }
     apiCall('/api/suggestions', { token: authToken, title: title, description: desc }).then(function (res) {
+      if (res.error === 'Not authenticated') { authToken = null; authUser = null; saveAuthToStorage(); updateAuthUI(); showAuthOverlay(); return; }
       if (res.error) { alert(res.error); return; }
       closeSuggestionForm();
       renderSuggestions();
