@@ -2,6 +2,7 @@ const express = require('express');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,10 +10,21 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '2mb' }));
 app.get('/health', (req, res) => res.json({ ok: true }));
 
-const DATA_DIR = path.join(__dirname, 'data');
-const DATA_PATH = path.join(DATA_DIR, 'typing-data.json');
-
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+function getDataPath() {
+  const tryDir = path.join(__dirname, 'data');
+  try {
+    if (!fs.existsSync(tryDir)) fs.mkdirSync(tryDir, { recursive: true });
+    const p = path.join(tryDir, 'typing-data.json');
+    fs.accessSync(tryDir, fs.constants.W_OK);
+    console.log('Using persistent data dir:', tryDir);
+    return p;
+  } catch (e) {
+    const fallback = path.join(os.tmpdir(), 'typing-data.json');
+    console.log('Using tmp data dir:', os.tmpdir());
+    return fallback;
+  }
+}
+const DATA_PATH = getDataPath();
 
 let data = { users: [], sessions: [], progress: [], leaderboard: [], suggestions: [], comments: [] };
 
