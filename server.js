@@ -120,8 +120,14 @@ function createS3Storage() {
       for (const row of rows) { try { progress[row.language] = JSON.parse(row.data); } catch (e) { progress[row.language] = null; } }
       return progress;
     },
-    async submitLeaderboard(display_name, language, speed, accuracy, total_chars) {
-      data.leaderboard.push({ display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, created_at: new Date().toISOString() });
+    async submitLeaderboard(user_id, display_name, language, speed, accuracy, total_chars) {
+      const idx = data.leaderboard.findIndex(e => e.user_id === user_id && e.language === language);
+      if (idx >= 0) {
+        if (speed <= data.leaderboard[idx].speed) return { ok: true };
+        data.leaderboard[idx] = { user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, created_at: new Date().toISOString() };
+      } else {
+        data.leaderboard.push({ user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, created_at: new Date().toISOString() });
+      }
       await s3Save(data);
       return { ok: true };
     },
@@ -272,8 +278,14 @@ function createJsonStorage() {
       for (const row of rows) { try { progress[row.language] = JSON.parse(row.data); } catch (e) { progress[row.language] = null; } }
       return progress;
     },
-    submitLeaderboard(display_name, language, speed, accuracy, total_chars) {
-      data.leaderboard.push({ display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, created_at: new Date().toISOString() });
+    submitLeaderboard(user_id, display_name, language, speed, accuracy, total_chars) {
+      const idx = data.leaderboard.findIndex(e => e.user_id === user_id && e.language === language);
+      if (idx >= 0) {
+        if (speed <= data.leaderboard[idx].speed) return { ok: true };
+        data.leaderboard[idx] = { user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, created_at: new Date().toISOString() };
+      } else {
+        data.leaderboard.push({ user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, created_at: new Date().toISOString() });
+      }
       fs.writeFileSync(dataPath, JSON.stringify(data));
       return { ok: true };
     },
@@ -400,7 +412,7 @@ app.post('/api/leaderboard/submit', async (req, res) => {
   if (!user) return res.json({ error: 'Not authenticated' });
   const { language, speed, accuracy, total_chars } = req.body;
   if (!language || speed == null) return res.json({ error: 'Missing fields' });
-  const r = await st.submitLeaderboard(user.display_name, language, speed, accuracy, total_chars);
+  const r = await st.submitLeaderboard(user.user_id, user.display_name, language, speed, accuracy, total_chars);
   res.json(r);
 });
 
