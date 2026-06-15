@@ -7,11 +7,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '2mb' }));
-app.use(express.static(__dirname));
-
-app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
 
 const db = new Database(path.join(__dirname, 'data.db'));
 db.pragma('journal_mode = WAL');
@@ -149,6 +144,12 @@ app.get('/api/leaderboard', (req, res) => {
   sql += ' ORDER BY speed DESC, accuracy DESC LIMIT 100';
   const rows = db.prepare(sql).all(...params);
   res.json(rows);
+});
+
+app.use(express.static(__dirname));
+
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, () => {
