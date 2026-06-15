@@ -148,6 +148,58 @@ app.post('/api/suggestions/:id/comments', (req, res) => {
   res.json({ ok: true });
 });
 
+app.post('/api/suggestions/:id/edit', (req, res) => {
+  const user = getUserFromToken(req.body.token);
+  if (!user) return res.json({ error: 'Not authenticated' });
+  const s = (data.suggestions || []).find(s => s.id === Number(req.params.id));
+  if (!s) return res.json({ error: 'Not found' });
+  if (s.user_id !== user.user_id) return res.json({ error: 'Forbidden' });
+  const { title, description } = req.body;
+  if (title !== undefined) s.title = title;
+  if (description !== undefined) s.description = description;
+  save();
+  res.json({ ok: true });
+});
+
+app.post('/api/suggestions/:id/delete', (req, res) => {
+  const user = getUserFromToken(req.body.token);
+  if (!user) return res.json({ error: 'Not authenticated' });
+  const s = (data.suggestions || []).find(s => s.id === Number(req.params.id));
+  if (!s) return res.json({ error: 'Not found' });
+  if (s.user_id !== user.user_id && user.username !== ADMIN_USERNAME) return res.json({ error: 'Forbidden' });
+  data.suggestions = (data.suggestions || []).filter(x => x.id !== s.id);
+  data.comments = (data.comments || []).filter(c => c.suggestion_id !== s.id);
+  save();
+  res.json({ ok: true });
+});
+
+app.post('/api/suggestions/:id/comments/:commentId/edit', (req, res) => {
+  const user = getUserFromToken(req.body.token);
+  if (!user) return res.json({ error: 'Not authenticated' });
+  const c = (data.comments || []).find(c => c.id === Number(req.params.commentId) && c.suggestion_id === Number(req.params.id));
+  if (!c) return res.json({ error: 'Not found' });
+  if (c.user_id !== user.user_id) return res.json({ error: 'Forbidden' });
+  const { text } = req.body;
+  if (text !== undefined) c.text = text;
+  save();
+  res.json({ ok: true });
+});
+
+app.post('/api/suggestions/:id/comments/:commentId/delete', (req, res) => {
+  const user = getUserFromToken(req.body.token);
+  if (!user) return res.json({ error: 'Not authenticated' });
+  const c = (data.comments || []).find(c => c.id === Number(req.params.commentId) && c.suggestion_id === Number(req.params.id));
+  if (!c) return res.json({ error: 'Not found' });
+  if (c.user_id !== user.user_id && user.username !== ADMIN_USERNAME) return res.json({ error: 'Forbidden' });
+  data.comments = (data.comments || []).filter(x => x.id !== c.id);
+  const s = (data.suggestions || []).find(s => s.id === Number(req.params.id));
+  if (s) s.comments = (data.comments || []).filter(c => c.suggestion_id === s.id).length;
+  save();
+  res.json({ ok: true });
+});
+
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'OlegYdin';
+
 app.use(express.static(__dirname));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 

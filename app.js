@@ -1050,6 +1050,9 @@
     document.getElementById('suggestionsOverlay').classList.add('hidden');
   }
 
+  var ADMIN_USERNAME = 'OlegYdin';
+  var editSuggestionId = null;
+
   function renderSuggestions() {
     var content = document.getElementById('suggestionsContent');
     if (!content) return;
@@ -1064,6 +1067,11 @@
       var html = '';
       items.forEach(function (s) {
         var votedClass = s.user_voted ? ' voted' : '';
+        var isAuthor = authUser && authUser.user_id === s.user_id;
+        var isAdmin = authUser && authUser.username === ADMIN_USERNAME;
+        var actions = '';
+        if (isAuthor) actions += '<button class="btn-sm" onclick="window.__editSuggestion(' + s.id + ')">✏️</button>';
+        if (isAuthor || isAdmin) actions += '<button class="btn-sm" style="color:var(--incorrect)" onclick="window.__deleteSuggestion(' + s.id + ')">🗑️</button>';
         html += '<div class="suggestion-card" data-id="' + s.id + '">'
           + '<div class="suggestion-header">'
           + '<div class="suggestion-title">' + escHtml(s.title) + '</div>'
@@ -1073,6 +1081,7 @@
           + '<div class="suggestion-actions">'
           + '<button class="suggestion-vote-btn' + votedClass + '" onclick="window.__voteSuggestion(' + s.id + ')">👍 <span class="vote-count">' + s.votes + '</span></button>'
           + '<button class="suggestion-comment-toggle" onclick="window.__toggleComments(' + s.id + ')">💬 ' + s.comments + ' комментариев</button>'
+          + actions
           + '</div>'
           + '<div class="suggestion-comments hidden" id="comments-' + s.id + '"></div>'
           + '</div>';
@@ -1082,6 +1091,29 @@
       content.innerHTML = '<div class="leaderboard-empty">Ошибка загрузки</div>';
     });
   }
+
+  window.__editSuggestion = function (id) {
+    if (!authToken) { showAuthOverlay(); return; }
+    fetch(API_HOST + '/api/suggestions').then(function (r) { return r.json(); }).then(function (items) {
+      var s = items.find(function (x) { return x.id === id; });
+      if (!s) return;
+      editSuggestionId = id;
+      document.querySelector('#suggestionFormOverlay h2').textContent = 'Редактировать идею';
+      document.getElementById('suggestionTitleInput').value = s.title;
+      document.getElementById('suggestionDescInput').value = s.description || '';
+      document.getElementById('suggestionFormOverlay').classList.remove('hidden');
+    });
+  };
+
+  window.__deleteSuggestion = function (id) {
+    if (!authToken) { showAuthOverlay(); return; }
+    if (!confirm('Удалить это предложение?')) return;
+    apiCall('/api/suggestions/' + id + '/delete', { token: authToken }).then(function (res) {
+      if (res.error === 'Not authenticated') { authToken = null; authUser = null; saveAuthToStorage(); updateAuthUI(); showAuthOverlay(); return; }
+      if (res.error === 'Forbidden') { alert('Нет прав'); return; }
+      renderSuggestions();
+    });
+  };
 
   window.__voteSuggestion = function (id) {
     if (!authToken) { showAuthOverlay(); return; }
@@ -1102,7 +1134,15 @@
       fetch(API_HOST + '/api/suggestions/' + id + '/comments').then(function (r) { return r.json(); }).then(function (comments) {
         var html = '';
         comments.forEach(function (c) {
-          html += '<div class="comment-item"><span class="comment-author">' + escHtml(c.display_name) + '</span><span class="comment-text">' + escHtml(c.text) + '</span><span class="comment-date">' + new Date(c.created_at).toLocaleString('ru-RU') + '</span></div>';
+          var isAuthor = authUser && authUser.user_id === c.user_id;
+          var isAdmin = authUser && authUser.username === ADMIN_USERNAME;
+          var commentActions = '';
+          if (isAuthor) commentActions += '<button class="btn-sm" onclick="window.__editComment(' + id + ',' + c.id + ')">✏️</button>';
+          if (isAuthor || isAdmin) commentActions += '<button class="btn-sm" style="color:var(--incorrect)" onclick="window.__deleteComment(' + id + ',' + c.id + ')">🗑️</button>';
+          html += '<div class="comment-item"><span class="comment-author">' + escHtml(c.display_name) + '</span><span class="comment-text">';
+          html += '<span class="comment-text-display" id="ctext-' + c.id + '">' + escHtml(c.text) + '</span>';
+          html += commentActions;
+          html += '</span><span class="comment-date">' + new Date(c.created_at).toLocaleString('ru-RU') + '</span></div>';
         });
         html += '<div class="comment-form">'
           + '<input type="text" id="comment-input-' + id + '" placeholder="Написать комментарий..." onkeydown="if(event.key==\'Enter\'&&!event.shiftKey){event.preventDefault();window.__submitComment(' + id + ')}">'
@@ -1130,11 +1170,52 @@
     });
   };
 
+  window.__editComment = function (suggId, commentId) {
+    if (!authToken) { showAuthOverlay(); return; }
+    var el = document.getElementById('ctext-' + commentId);
+    if (!el) return;
+    var current = el.textContent;
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.value = current;
+    input.style.cssText = 'width:80%;background:var(--surface);border:1px solid var(--accent);border-radius:4px;color:var(--text);font:inherit;padding:2px 6px;';
+    el.textContent = '';
+    el.appendChild(input);
+    input.focus();
+    input.select();
+    function done() {
+      var val = input.value.trim();
+      if (!val) { el.textContent = current; return; }
+      apiCall('/api/suggestions/' + suggId + '/comments/' + commentId + '/edit', { token: authToken, text: val }).then(function (res) {
+        if (res.ok) { el.textContent = val; }
+        else { el.textContent = current; }
+      });
+    }
+    input.addEventListener('blur', done);
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); done(); }
+      if (e.key === 'Escape') { el.textContent = current; }
+    });
+  };
+
+  window.__deleteComment = function (suggId, commentId) {
+    if (!authToken) { showAuthOverlay(); return; }
+    if (!confirm('Удалить этот комментарий?')) return;
+    apiCall('/api/suggestions/' + suggId + '/comments/' + commentId + '/delete', { token: authToken }).then(function (res) {
+      if (res.error === 'Not authenticated') { authToken = null; authUser = null; saveAuthToStorage(); updateAuthUI(); showAuthOverlay(); return; }
+      if (res.error === 'Forbidden') { alert('Нет прав'); return; }
+      window.__toggleComments(suggId);
+      renderSuggestions();
+    });
+  };
+
   function openSuggestionForm() {
     if (!authToken) { showAuthOverlay(); return; }
+    editSuggestionId = null;
     document.getElementById('suggestionTitleInput').value = '';
     document.getElementById('suggestionDescInput').value = '';
     document.getElementById('suggestionFormOverlay').classList.remove('hidden');
+    document.querySelector('#suggestionFormOverlay h2').textContent = 'Новая идея';
   }
 
   function closeSuggestionForm() {
@@ -1146,7 +1227,8 @@
     var title = document.getElementById('suggestionTitleInput').value.trim();
     var desc = document.getElementById('suggestionDescInput').value.trim();
     if (!title) { alert('Введите заголовок'); return; }
-    apiCall('/api/suggestions', { token: authToken, title: title, description: desc }).then(function (res) {
+    var url = editSuggestionId ? ('/api/suggestions/' + editSuggestionId + '/edit') : '/api/suggestions';
+    apiCall(url, { token: authToken, title: title, description: desc }).then(function (res) {
       if (res.error === 'Not authenticated') { authToken = null; authUser = null; saveAuthToStorage(); updateAuthUI(); showAuthOverlay(); return; }
       if (res.error) { alert(res.error); return; }
       closeSuggestionForm();
