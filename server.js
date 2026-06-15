@@ -2,7 +2,6 @@ const express = require('express');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
-const os = require('os');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,7 +9,10 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '2mb' }));
 app.get('/health', (req, res) => res.json({ ok: true }));
 
-const DATA_PATH = path.join(os.tmpdir(), 'typing-data.json');
+const DATA_DIR = path.join(__dirname, 'data');
+const DATA_PATH = path.join(DATA_DIR, 'typing-data.json');
+
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
 let data = { users: [], sessions: [], progress: [], leaderboard: [], suggestions: [], comments: [] };
 
