@@ -11,18 +11,25 @@ app.use(express.json({ limit: '2mb' }));
 app.get('/health', (req, res) => res.json({ ok: true }));
 
 function getDataPath() {
-  const tryDir = path.join(__dirname, 'data');
-  try {
-    if (!fs.existsSync(tryDir)) fs.mkdirSync(tryDir, { recursive: true });
-    const p = path.join(tryDir, 'typing-data.json');
-    fs.accessSync(tryDir, fs.constants.W_OK);
-    console.log('Using persistent data dir:', tryDir);
-    return p;
-  } catch (e) {
-    const fallback = path.join(os.tmpdir(), 'typing-data.json');
-    console.log('Using tmp data dir:', os.tmpdir());
-    return fallback;
+  if (process.env.DATA_PATH) return process.env.DATA_PATH;
+  const candidates = [
+    path.join(__dirname, 'data'),
+    path.join(os.homedir(), 'typing-trainer-data'),
+    path.join('/tmp', 'typing-trainer-data'),
+  ];
+  for (const dir of candidates) {
+    try {
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      const p = path.join(dir, 'typing-data.json');
+      fs.writeFileSync(p, JSON.stringify({ _test: true }), 'utf8');
+      fs.unlinkSync(p);
+      console.log('Data path:', dir);
+      return p;
+    } catch (e) { /* try next */ }
   }
+  const fallback = path.join(os.tmpdir(), 'typing-data.json');
+  console.log('Data path (tmp):', os.tmpdir());
+  return fallback;
 }
 const DATA_PATH = getDataPath();
 
