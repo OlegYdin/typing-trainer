@@ -1071,7 +1071,7 @@
         var isAdmin = authUser && authUser.username === ADMIN_USERNAME;
         var actions = '';
         if (isAuthor) actions += '<button class="btn-sm" onclick="window.__editSuggestion(' + s.id + ')">✏️</button>';
-        if (isAuthor || isAdmin) actions += '<button class="btn-sm" style="color:var(--incorrect)" onclick="window.__deleteSuggestion(' + s.id + ')">🗑️</button>';
+        if (isAdmin) actions += '<button class="btn-sm" style="color:var(--incorrect)" onclick="window.__deleteSuggestion(' + s.id + ')">🗑️</button>';
         html += '<div class="suggestion-card" data-id="' + s.id + '">'
           + '<div class="suggestion-header">'
           + '<div class="suggestion-title">' + escHtml(s.title) + '</div>'
@@ -1138,7 +1138,7 @@
           var isAdmin = authUser && authUser.username === ADMIN_USERNAME;
           var commentActions = '';
           if (isAuthor) commentActions += '<button class="btn-sm" onclick="window.__editComment(' + id + ',' + c.id + ')">✏️</button>';
-          if (isAuthor || isAdmin) commentActions += '<button class="btn-sm" style="color:var(--incorrect)" onclick="window.__deleteComment(' + id + ',' + c.id + ')">🗑️</button>';
+          if (isAdmin) commentActions += '<button class="btn-sm" style="color:var(--incorrect)" onclick="window.__deleteComment(' + id + ',' + c.id + ')">🗑️</button>';
           html += '<div class="comment-item"><span class="comment-author">' + escHtml(c.display_name) + '</span><span class="comment-text">';
           html += '<span class="comment-text-display" id="ctext-' + c.id + '">' + escHtml(c.text) + '</span>';
           html += commentActions;

@@ -187,7 +187,7 @@ app.post('/api/suggestions/:id/delete', (req, res) => {
   if (!user) return res.json({ error: 'Not authenticated' });
   const s = (data.suggestions || []).find(s => s.id === Number(req.params.id));
   if (!s) return res.json({ error: 'Not found' });
-  if (s.user_id !== user.user_id && user.username !== ADMIN_USERNAME) return res.json({ error: 'Forbidden' });
+  if (user.username !== ADMIN_USERNAME) return res.json({ error: 'Forbidden' });
   data.suggestions = (data.suggestions || []).filter(x => x.id !== s.id);
   data.comments = (data.comments || []).filter(c => c.suggestion_id !== s.id);
   save();
@@ -211,7 +211,7 @@ app.post('/api/suggestions/:id/comments/:commentId/delete', (req, res) => {
   if (!user) return res.json({ error: 'Not authenticated' });
   const c = (data.comments || []).find(c => c.id === Number(req.params.commentId) && c.suggestion_id === Number(req.params.id));
   if (!c) return res.json({ error: 'Not found' });
-  if (c.user_id !== user.user_id && user.username !== ADMIN_USERNAME) return res.json({ error: 'Forbidden' });
+  if (user.username !== ADMIN_USERNAME) return res.json({ error: 'Forbidden' });
   data.comments = (data.comments || []).filter(x => x.id !== c.id);
   const s = (data.suggestions || []).find(s => s.id === Number(req.params.id));
   if (s) s.comments = (data.comments || []).filter(c => c.suggestion_id === s.id).length;
