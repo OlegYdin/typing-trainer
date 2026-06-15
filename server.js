@@ -11,6 +11,8 @@ app.use(express.json({ limit: '2mb' }));
 
 const DB_PATH = path.join(os.tmpdir(), 'typing.db');
 
+app.get('/health', (req, res) => res.json({ ok: true }));
+
 function hashPhrase(phrase) {
   return crypto.createHash('sha256').update(phrase).digest('hex');
 }
@@ -192,13 +194,12 @@ async function init() {
   app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'index.html'));
   });
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}, db at ${DB_PATH}`);
-  });
 }
 
-init().catch(err => {
-  console.error('Failed:', err);
-  process.exit(1);
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+  init().catch(err => {
+    console.error('Init failed:', err);
+    process.exit(1);
+  });
 });
