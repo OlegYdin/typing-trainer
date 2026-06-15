@@ -3,14 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Клавиатурный тренажёр</title>
+  <title>Клавиатурный тренажёр - бесплатная игра для улучшения скорости печати</title>
+  <meta name="description" content="Клавиатурный тренажёр с прогрессивным открытием букв. Изучите новые символы, улучшите скорость и точность печати. Поддерживает русские и английские раскладки, тёмную тему и автономное сохранение прогресса.">
+  <meta name="keywords" content="клавиатурный тренажёр, игра для печати, скорость печати, точность печати, обучение печати, бесплатная игра, клавиатура тренажёр">
+  <meta name="author" content="Typing Trainer">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0f0f1a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Typing Trainer">
+  <meta name="apple-mobile-web-app-title" content="Typing Trainer">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c63ff'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c63ff'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
-  <script src="exercises.js"></script>
-</head>
+
+  <link rel="canonical" href="https://typing-trainer.example.com/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Typing Trainer",
+    "description": "Клавиатурный тренажёр с прогрессивным открытием букв для улучшения скорости и точности печати.",
+    "url": "https://typing-trainer.example.com/",
+    "applicationCategory": "Game",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Typing Trainer"
+    }
+  }
+  </script>
 <body>
   <div id="app">
     <header>
       <h1 id="mainTitle">Клавиатурный тренажёр</h1>
+
+      <div class="user-area" id="userArea">
+        <div class="user-info">
+          <span class="user-name" id="userName">Гость</span>
+        </div>
+        <button class="btn btn-small btn-accent" id="signInBtn">Войти</button>
+        <button class="btn btn-small btn-secondary hidden" id="signOutBtn">Выйти</button>
+      </div>
+
       <div class="stats">
         <div class="stat" id="speedStat">
           <span class="stat-icon">⚡</span>
@@ -48,8 +91,6 @@
         <div class="content-area">
           <div class="target-bar">
             <select id="langSelect" class="lang-select"></select>
-            <button class="mode-toggle" id="modeToggleBtn">Курс</button>
-            <span class="target-item" id="courseLevelDisplay" style="display:none"></span>
             <span class="target-sep">·</span>
             <span class="target-item" id="targetSpeedItem">⚡ <span id="targetSpeed">200</span> симв/мин</span>
             <span class="target-sep">·</span>
@@ -66,46 +107,11 @@
             <div class="hint" id="hintText">Нажми любую клавишу, чтобы начать</div>
           </section>
 
-          <section class="course-area" id="courseArea" style="display:none">
-            <div class="course-theory" id="courseTheory" style="display:none"></div>
-            <div class="course-progress" id="courseProgress" style="display:none">
-              <div class="course-progress-bar-bg">
-                <div class="course-progress-bar" id="courseProgressBar"></div>
-              </div>
-              <span class="course-progress-text" id="courseProgressText"></span>
-            </div>
-            <div class="course-step-selector" id="courseStepSelector"></div>
-            <div class="course-question" id="courseQuestion"></div>
-            <div class="course-feedback" id="courseFeedback" style="display:none"></div>
-            <div class="course-input-row">
-              <input class="course-input" id="courseInput" type="text" placeholder="Введите ответ..." autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
-              <button class="btn btn-primary" id="courseSubmit">Проверить</button>
-            </div>
-            <button class="btn btn-secondary" id="courseTheoryBtn" style="display:none">Понятно, начнём!</button>
-            <button class="btn btn-secondary" id="courseNext" style="display:none">Далее →</button>
-            <div class="course-count-selector" id="courseCountSelector" style="display:none">
-              <span>Примеров:</span>
-              <button class="btn btn-sm" data-count="10">10</button>
-              <button class="btn btn-sm" data-count="20">20</button>
-              <button class="btn btn-sm" data-count="30">30</button>
-              <button class="btn btn-sm" data-count="0">Все</button>
-            </div>
-            <div class="course-words" id="courseWords"></div>
-            <div class="course-option-toggles-row">
-              <label class="course-option-toggle">
-                <input type="checkbox" id="courseHidePrompt">
-                <span>Скрыть подсказки</span>
-              </label>
-              <label class="course-option-toggle">
-                <input type="checkbox" id="courseIgnoreCaseQuick" checked>
-                <span>Регистр</span>
-              </label>
-              <label class="course-option-toggle">
-                <input type="checkbox" id="courseIgnorePunctQuick" checked>
-                <span>Знаки</span>
-              </label>
-            </div>
-          </section>
+          <div class="key-press-counter" id="keyPressCounter">
+            <span class="kpc-label">Нажатий:</span>
+            <span class="kpc-value" id="keyPressValue">0</span>
+            <span class="kpc-lang" id="keyPressLang">—</span>
+          </div>
 
           <label class="keyboard-toggle" id="keyboardToggleLabel">
             <input type="checkbox" id="keyboardToggle">
@@ -118,8 +124,9 @@
           <div class="controls">
             <button class="btn btn-primary" id="newTextBtn">Новый текст</button>
             <button class="btn btn-secondary" id="statsBtn">Статистика</button>
-            <button class="btn btn-secondary" id="switchUserBtn" onclick="return window.switchUser()">Вход</button>
+            <button class="btn btn-secondary" id="leaderboardBtn">🏆 Таблица</button>
             <button class="btn btn-secondary" id="settingsBtn">⚙ Настройки</button>
+            <button class="btn btn-secondary" id="donateBtn">❤ Поддержать</button>
           </div>
         </div>
 
@@ -196,26 +203,24 @@
             <span>Автовыход (мин)</span>
             <input type="number" id="sessionTimeoutInput" min="1" max="999" value="30">
           </label>
-          <div class="setting-row">
-            <span>Ответы в курсе</span>
-            <div class="course-option-toggles">
-              <label class="course-option-toggle">
-                <input type="checkbox" id="courseIgnoreCase" checked>
-                <span>Игнорировать регистр</span>
-              </label>
-              <label class="course-option-toggle">
-                <input type="checkbox" id="courseIgnorePunct" checked>
-                <span>Игнорировать знаки препинания</span>
-              </label>
-            </div>
-          </div>
+
           <div class="setting-row">
             <span>Клавиатура</span>
-            <label class="course-option-toggle">
+            <label>
               <input type="checkbox" id="showKeyboardChk" checked>
               <span>Показать клавиатуру</span>
             </label>
           </div>
+          <label class="setting-row">
+            <span>Тема</span>
+            <select id="themeSelect" class="theme-select">
+              <option value="dark">Тёмная</option>
+              <option value="light">Светлая</option>
+              <option value="matrix">Матрица</option>
+              <option value="ocean">Океан</option>
+              <option value="retro">Ретро</option>
+            </select>
+          </label>
         </div>
         <div class="settings-actions">
           <button class="btn btn-primary" id="saveSettingsBtn">Сохранить</button>
@@ -227,15 +232,42 @@
 
     <div class="modal-overlay hidden" id="statsOverlay">
       <div class="modal modal-stats">
-        <h2>Статистика за всё время</h2>
-        <div class="stats-table" id="statsTable">
-          <div class="stats-row"><span>Всего уроков</span><span id="statTotalLessons">0</span></div>
-          <div class="stats-row"><span>Всего времени</span><span id="statTotalTime">0 мин</span></div>
-          <div class="stats-row"><span>Всего символов</span><span id="statTotalChars">0</span></div>
-          <div class="stats-row"><span>Лучшая скорость</span><span id="statBestSpeed">0 симв/мин</span></div>
-          <div class="stats-row"><span>Лучшая точность</span><span id="statBestAccuracy">0%</span></div>
-          <div class="stats-row"><span>Открыто букв</span><span id="statUnlockedLetters">0 / 33</span></div>
-          <div class="stats-row"><span>Текущий этап</span><span id="statCurrentStage">—</span></div>
+        <div class="stats-header">
+          <h2>Статистика</h2>
+          <div class="stats-tabs">
+            <button class="stat-tab active" data-tab="summary">Сводка</button>
+            <button class="stat-tab" data-tab="history">История</button>
+            <button class="stat-tab" data-tab="charts">Графики</button>
+          </div>
+        </div>
+        <div class="stats-content">
+          <div class="stat-panel active" id="panel-summary">
+            <div class="stats-table" id="statsTable">
+              <div class="stats-row"><span>Всего уроков</span><span id="statTotalLessons">0</span></div>
+              <div class="stats-row"><span>Всего времени</span><span id="statTotalTime">0 мин</span></div>
+              <div class="stats-row"><span>Всего символов</span><span id="statTotalChars">0</span></div>
+              <div class="stats-row"><span>Лучшая скорость</span><span id="statBestSpeed">0 симв/мин</span></div>
+              <div class="stats-row"><span>Лучшая точность</span><span id="statBestAccuracy">0%</span></div>
+              <div class="stats-row"><span>Открыто букв</span><span id="statUnlockedLetters">0 / 33</span></div>
+              <div class="stats-row"><span>Текущий этап</span><span id="statCurrentStage">—</span></div>
+              <div class="stats-row"><span>Всего нажатий</span><span id="statTotalKeyPresses">0</span></div>
+            </div>
+            <div class="key-presses-by-lang" id="keyPressesByLang"></div>
+          </div>
+          <div class="stat-panel" id="panel-history">
+            <div class="history-list" id="historyList"></div>
+          </div>
+          <div class="stat-panel" id="panel-charts">
+            <div class="chart-row">
+              <canvas id="chartSpeed"></canvas>
+            </div>
+            <div class="chart-row">
+              <canvas id="chartAccuracy"></canvas>
+            </div>
+            <div class="chart-row">
+              <canvas id="chartProgress"></canvas>
+            </div>
+          </div>
         </div>
         <button class="btn btn-primary" id="closeStatsBtn">Закрыть</button>
       </div>
@@ -243,32 +275,41 @@
 
     <div class="modal-overlay hidden" id="authOverlay">
       <div class="modal modal-auth">
-        <button class="modal-close" id="authCloseBtn" onclick="return window.hideAuthOverlay()">✕</button>
-        <h2 class="auth-title">Вход / Регистрация</h2>
-        <div id="authMigrateNotice" class="auth-info hidden" style="margin-bottom:12px"></div>
-        <div class="auth-field">
-          <label>Имя пользователя:</label>
-          <input type="text" id="authNameInput" class="auth-input" maxlength="20" placeholder="например: Иван">
-        </div>
-        <div class="auth-field">
-          <label>Ключевая фраза (10–50 символов):</label>
-          <textarea id="authPhraseInput" class="auth-textarea" maxlength="50" placeholder="придумайте фразу с цифрами и знаками"></textarea>
-          <span id="authPhraseCounter" class="auth-counter">0 / 50</span>
-        </div>
-        <div id="authMsg" class="auth-info" style="display:none"></div>
-        <div class="auth-actions">
-          <button class="btn btn-primary" id="authLoginBtn" onclick="return window.handleLogin()">Вход</button>
-          <button class="btn btn-secondary" id="authRegisterBtn" onclick="return window.handleRegister()">Регистрация</button>
-        </div>
-        <div id="authUserInfo" class="auth-user-info hidden">
-          <span id="authCurrentUserName"></span>
-          <button class="btn btn-danger" id="authLogoutBtn" onclick="return window.handleLogout()">Выйти</button>
+        <h2>Вход</h2>
+        <p class="auth-subtitle">Слепая печать — суперсила XXI века.<br>Введите имя и фразу, чтобы сохранять прогресс</p>
+        <div class="auth-phrase-form">
+          <input type="text" id="authUsernameInput" class="auth-input" placeholder="Ваше имя" autocomplete="off">
+          <textarea id="authPhraseInput" class="auth-input auth-phrase" rows="2" placeholder="Фраза (вместо пароля)" autocomplete="off"></textarea>
+          <div class="auth-phrase-actions">
+            <button class="btn btn-primary" id="authPhraseLogin">Войти</button>
+            <button class="btn btn-secondary" id="authPhraseRegister">Регистрация</button>
+          </div>
+          <div class="auth-error hidden" id="authError"></div>
         </div>
       </div>
     </div>
-  </div>
+
+    <div class="modal-overlay hidden" id="leaderboardOverlay">
+      <div class="modal modal-stats">
+        <div class="stats-header">
+          <h2>🏆 Таблица лидеров</h2>
+          <div class="stats-tabs" id="lbTabs">
+            <button class="stat-tab active" data-lb-lang="">Все языки</button>
+            <button class="stat-tab" data-lb-lang="ru">Русский</button>
+            <button class="stat-tab" data-lb-lang="en">English</button>
+            <button class="stat-tab" data-lb-lang="code">Код</button>
+          </div>
+        </div>
+        <div class="leaderboard-content" id="leaderboardContent">
+          <div class="leaderboard-empty">Загрузка...</div>
+        </div>
+        <button class="btn btn-primary" id="closeLeaderboardBtn">Закрыть</button>
+      </div>
+    </div>
 
   <script src="app.js"></script>
+  <script src="https://yandex.ru/games/sdk/v2"></script>
   <div id="appVersion" class="app-version"></div>
+</div>
 </body>
 </html>

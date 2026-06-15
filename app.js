@@ -15,7 +15,8 @@
     '_':'-','+':'=','{':'[','}':']','|':'\\',':':';','"':'\'','<':',','>':'.','?':'/'
   };
 
-  const AUTH_KEY = 'typingTrainerUsers';
+  const STORAGE_KEY = 'typingTrainerState_v2';
+  const SAVE_DEBOUNCE_MS = 1000;
 
   const LANG_DATA = {
     ru: {
@@ -334,280 +335,7 @@
     },
   };
 
-  const COURSE_DATA = {
-    en: {
-      gridCells: [
-        { id: 'pres-aff', tense: 'Present Simple', type: 'утверждение', row: 0, col: 0 },
-        { id: 'pres-neg', tense: 'Present Simple', type: 'отрицание', row: 0, col: 1 },
-        { id: 'pres-ques', tense: 'Present Simple', type: 'вопрос', row: 0, col: 2 },
-        { id: 'past-aff', tense: 'Past Simple', type: 'утверждение', row: 1, col: 0 },
-        { id: 'past-neg', tense: 'Past Simple', type: 'отрицание', row: 1, col: 1 },
-        { id: 'past-ques', tense: 'Past Simple', type: 'вопрос', row: 1, col: 2 },
-        { id: 'fut-aff', tense: 'Future Simple', type: 'утверждение', row: 2, col: 0 },
-        { id: 'fut-neg', tense: 'Future Simple', type: 'отрицание', row: 2, col: 1 },
-        { id: 'fut-ques', tense: 'Future Simple', type: 'вопрос', row: 2, col: 2 },
-      ],
-      levels: [
-        {
-          id: 'A1', name: 'Начальный',
-          // Cells in order of progression (0-8)
-          units: [
-            // ── Unit 1: Present Simple, Affirmative ──
-            {
-              cellId: 'pres-aff',
-              theory: '<h3>Present Simple. Утверждение</h3>' +
-                '<p>В настоящем простом времени (Present Simple) мы говорим о фактах, привычках и регулярных действиях.</p>' +
-                '<p>Формула: <strong>Подлежащее + глагол</strong></p>' +
-                '<div class="example">I work every day. — Я работаю каждый день.</div>' +
-                '<div class="example">He reads books. — Он читает книги.</div>' +
-                '<p>Важно: с he / she / it к глаголу добавляется окончание <strong>-s</strong> или <strong>-es</strong>.</p>',
-              blocks: [
-                {
-                  type: 'translate', label: 'Перевод',
-                  pool: [
-                    { prompt: 'Я работаю', answer: 'I work' },
-                    { prompt: 'Он читает', answer: 'He reads' },
-                    { prompt: 'Она пишет', answer: 'She writes' },
-                    { prompt: 'Они играют', answer: 'They play' },
-                    { prompt: 'Мы живём', answer: 'We live' },
-                    { prompt: 'Ты говоришь', answer: 'You speak' },
-                    { prompt: 'Кот спит', answer: 'The cat sleeps' },
-                    { prompt: 'Собака бегает', answer: 'The dog runs' },
-                    { prompt: 'Дети учатся', answer: 'Children learn' },
-                    { prompt: 'Солнце светит', answer: 'The sun shines' },
-                    { prompt: 'Она готовит ужин', answer: 'She cooks dinner' },
-                    { prompt: 'Он водит машину', answer: 'He drives a car' },
-                    { prompt: 'Мы смотрим телевизор', answer: 'We watch TV' },
-                    { prompt: 'Птицы поют', answer: 'Birds sing' },
-                  ],
-                },
-                {
-                  type: 'build', label: 'Сборка',
-                  pool: [
-                    { prompt: 'Я работаю каждый день', answer: 'I work every day' },
-                    { prompt: 'Он читает книги', answer: 'He reads books' },
-                    { prompt: 'Она пишет письмо', answer: 'She writes a letter' },
-                    { prompt: 'Они играют в футбол', answer: 'They play football' },
-                    { prompt: 'Мы живём в Лондоне', answer: 'We live in London' },
-                    { prompt: 'Ты говоришь по-английски', answer: 'You speak English' },
-                    { prompt: 'Кот спит на диване', answer: 'The cat sleeps on the sofa' },
-                    { prompt: 'Собака бегает в парке', answer: 'The dog runs in the park' },
-                    { prompt: 'Солнце светит ярко', answer: 'The sun shines brightly' },
-                    { prompt: 'Она готовит ужин', answer: 'She cooks dinner' },
-                    { prompt: 'Он водит машину', answer: 'He drives a car' },
-                    { prompt: 'Мы смотрим телевизор', answer: 'We watch TV' },
-                    { prompt: 'Они слушают музыку', answer: 'They listen to music' },
-                    { prompt: 'Птицы поют утром', answer: 'Birds sing in the morning' },
-                  ],
-                },
-                {
-                  type: 'fill_gap', label: 'Вставка',
-                  pool: [
-                    { prompt: 'I ___ every day.', answer: 'work', hint: 'work' },
-                    { prompt: 'He ___ books.', answer: 'reads', hint: 'read' },
-                    { prompt: 'She ___ a letter.', answer: 'writes', hint: 'write' },
-                    { prompt: 'They ___ football.', answer: 'play', hint: 'play' },
-                    { prompt: 'We ___ in London.', answer: 'live', hint: 'live' },
-                    { prompt: 'You ___ English.', answer: 'speak', hint: 'speak' },
-                    { prompt: 'The cat ___ on the sofa.', answer: 'sleeps', hint: 'sleep' },
-                    { prompt: 'The dog ___ in the park.', answer: 'runs', hint: 'run' },
-                    { prompt: 'The sun ___ brightly.', answer: 'shines', hint: 'shine' },
-                    { prompt: 'She ___ dinner.', answer: 'cooks', hint: 'cook' },
-                    { prompt: 'He ___ a car.', answer: 'drives', hint: 'drive' },
-                    { prompt: 'Birds ___ in the morning.', answer: 'sing', hint: 'sing' },
-                  ],
-                },
-                {
-                  type: 'choice', label: 'Выбор формы',
-                  pool: [
-                    { prompt: 'He ___ coffee. a) drink  b) drinks', answer: 'drinks' },
-                    { prompt: 'They ___ tea. a) like  b) likes', answer: 'like' },
-                    { prompt: 'She ___ English. a) speak  b) speaks', answer: 'speaks' },
-                    { prompt: 'I ___ to music. a) listen  b) listens', answer: 'listen' },
-                    { prompt: 'The dog ___ fast. a) run  b) runs', answer: 'runs' },
-                    { prompt: 'Birds ___ high. a) fly  b) flies', answer: 'fly' },
-                    { prompt: 'He ___ books. a) read  b) reads', answer: 'reads' },
-                    { prompt: 'We ___ TV. a) watch  b) watches', answer: 'watch' },
-                    { prompt: 'She ___ dinner. a) cook  b) cooks', answer: 'cooks' },
-                    { prompt: 'They ___ football. a) play  b) plays', answer: 'play' },
-                  ],
-                },
-              ],
-            },
-            // ── Unit 2: Present Simple, Negative ──
-            {
-              cellId: 'pres-neg',
-              theory: '<h3>Present Simple. Отрицание</h3>' +
-                '<p>Для отрицания используем вспомогательный глагол <strong>do</strong> (I / you / we / they) или <strong>does</strong> (he / she / it) + частицу <strong>not</strong>.</p>' +
-                '<p>Формула: <strong>Подлежащее + do/does + not + глагол</strong></p>' +
-                '<div class="example">I do not (don\'t) work. — Я не работаю.</div>' +
-                '<div class="example">He does not (doesn\'t) read. — Он не читает.</div>' +
-                '<p>Обрати внимание: после does глагол возвращается в начальную форму (без -s).</p>',
-              blocks: [
-                {
-                  type: 'translate', label: 'Перевод',
-                  pool: [
-                    { prompt: 'Я не работаю', answer: "I don't work" },
-                    { prompt: 'Он не читает', answer: "He doesn't read" },
-                    { prompt: 'Она не пишет', answer: "She doesn't write" },
-                    { prompt: 'Они не играют', answer: "They don't play" },
-                    { prompt: 'Мы не живём здесь', answer: "We don't live here" },
-                    { prompt: 'Кот не спит', answer: "The cat doesn't sleep" },
-                    { prompt: 'Собака не бегает', answer: "The dog doesn't run" },
-                    { prompt: 'Я не люблю кофе', answer: "I don't like coffee" },
-                    { prompt: 'Она не готовит мясо', answer: "She doesn't cook meat" },
-                    { prompt: 'Он не водит автобус', answer: "He doesn't drive a bus" },
-                    { prompt: 'Мы не смотрим ужастики', answer: "We don't watch horror films" },
-                    { prompt: 'Птицы не поют ночью', answer: "Birds don't sing at night" },
-                    { prompt: 'Ты не говоришь по-французски', answer: "You don't speak French" },
-                    { prompt: 'Дети не учат китайский', answer: "Children don't learn Chinese" },
-                  ],
-                },
-                {
-                  type: 'build', label: 'Сборка',
-                  pool: [
-                    { prompt: 'Я не работаю в воскресенье', answer: "I don't work on Sunday" },
-                    { prompt: 'Он не читает книги', answer: "He doesn't read books" },
-                    { prompt: 'Она не пишет письма', answer: "She doesn't write letters" },
-                    { prompt: 'Они не играют в футбол', answer: "They don't play football" },
-                    { prompt: 'Мы не живём в Лондоне', answer: "We don't live in London" },
-                    { prompt: 'Ты не говоришь по-французски', answer: "You don't speak French" },
-                    { prompt: 'Кот не спит здесь', answer: "The cat doesn't sleep here" },
-                    { prompt: 'Собака не бегает быстро', answer: "The dog doesn't run fast" },
-                    { prompt: 'Она не готовит мясо', answer: "She doesn't cook meat" },
-                    { prompt: 'Он не водит автобус', answer: "He doesn't drive a bus" },
-                    { prompt: 'Птицы не поют ночью', answer: "Birds don't sing at night" },
-                  ],
-                },
-                {
-                  type: 'fill_gap', label: 'Вставка',
-                  pool: [
-                    { prompt: 'I ___ on Sunday.', answer: "don't work", hint: 'not work' },
-                    { prompt: 'He ___ books.', answer: "doesn't read", hint: 'not read' },
-                    { prompt: 'She ___ letters.', answer: "doesn't write", hint: 'not write' },
-                    { prompt: 'They ___ football.', answer: "don't play", hint: 'not play' },
-                    { prompt: 'We ___ in London.', answer: "don't live", hint: 'not live' },
-                    { prompt: 'The cat ___ here.', answer: "doesn't sleep", hint: 'not sleep' },
-                    { prompt: 'The dog ___ fast.', answer: "doesn't run", hint: 'not run' },
-                    { prompt: 'She ___ meat.', answer: "doesn't cook", hint: 'not cook' },
-                    { prompt: 'He ___ a bus.', answer: "doesn't drive", hint: 'not drive' },
-                    { prompt: 'Birds ___ at night.', answer: "don't sing", hint: 'not sing' },
-                  ],
-                },
-                {
-                  type: 'choice', label: 'Выбор формы',
-                  pool: [
-                    { prompt: 'I ___ coffee. a) don\'t like  b) doesn\'t like', answer: "don't like" },
-                    { prompt: 'He ___ books. a) don\'t read  b) doesn\'t read', answer: "doesn't read" },
-                    { prompt: 'She ___ letters. a) don\'t write  b) doesn\'t write', answer: "doesn't write" },
-                    { prompt: 'They ___ football. a) don\'t play  b) doesn\'t play', answer: "don't play" },
-                    { prompt: 'We ___ here. a) don\'t live  b) doesn\'t live', answer: "don't live" },
-                    { prompt: 'The cat ___ here. a) don\'t sleep  b) doesn\'t sleep', answer: "doesn't sleep" },
-                    { prompt: 'The dog ___ fast. a) don\'t run  b) doesn\'t run', answer: "doesn't run" },
-                    { prompt: 'She ___ meat. a) don\'t cook  b) doesn\'t cook', answer: "doesn't cook" },
-                    { prompt: 'Birds ___ at night. a) don\'t sing  b) doesn\'t sing', answer: "don't sing" },
-                  ],
-                },
-              ],
-            },
-            // ── Unit 3: Present Simple, Question ──
-            {
-              cellId: 'pres-ques',
-              theory: '<h3>Present Simple. Вопрос</h3>' +
-                '<p>Для вопроса ставим <strong>Do</strong> или <strong>Does</strong> в начало предложения.</p>' +
-                '<p>Формула: <strong>Do/Does + подлежащее + глагол?</strong></p>' +
-                '<div class="example">Do you work? — Ты работаешь?</div>' +
-                '<div class="example">Does he read? — Он читает?</div>' +
-                '<p>После does глагол без -s. На такие вопросы отвечаем: <em>Yes, I do</em> / <em>No, he doesn\'t</em>.</p>',
-              blocks: [
-                {
-                  type: 'translate', label: 'Перевод',
-                  pool: [
-                    { prompt: 'Ты работаешь?', answer: 'Do you work' },
-                    { prompt: 'Он читает?', answer: 'Does he read' },
-                    { prompt: 'Она пишет?', answer: 'Does she write' },
-                    { prompt: 'Они играют?', answer: 'Do they play' },
-                    { prompt: 'Вы говорите по-английски?', answer: 'Do you speak English' },
-                    { prompt: 'Кот спит?', answer: 'Does the cat sleep' },
-                    { prompt: 'Собака бегает?', answer: 'Does the dog run' },
-                    { prompt: 'Ты любишь кофе?', answer: 'Do you like coffee' },
-                    { prompt: 'Она готовит ужин?', answer: 'Does she cook dinner' },
-                    { prompt: 'Он водит машину?', answer: 'Does he drive a car' },
-                    { prompt: 'Мы смотрим телевизор?', answer: 'Do we watch TV' },
-                    { prompt: 'Птицы поют?', answer: 'Do birds sing' },
-                    { prompt: 'Дети учатся в школе?', answer: 'Do children learn at school' },
-                  ],
-                },
-                {
-                  type: 'build', label: 'Сборка',
-                  pool: [
-                    { prompt: 'Ты работаешь каждый день?', answer: 'Do you work every day' },
-                    { prompt: 'Он читает книги?', answer: 'Does he read books' },
-                    { prompt: 'Она пишет письма?', answer: 'Does she write letters' },
-                    { prompt: 'Они играют в футбол?', answer: 'Do they play football' },
-                    { prompt: 'Ты говоришь по-английски?', answer: 'Do you speak English' },
-                    { prompt: 'Кот спит здесь?', answer: 'Does the cat sleep here' },
-                    { prompt: 'Собака бегает быстро?', answer: 'Does the dog run fast' },
-                    { prompt: 'Ты любишь кофе?', answer: 'Do you like coffee' },
-                    { prompt: 'Она готовит ужин?', answer: 'Does she cook dinner' },
-                    { prompt: 'Он водит машину?', answer: 'Does he drive a car' },
-                    { prompt: 'Птицы поют утром?', answer: 'Do birds sing in the morning' },
-                  ],
-                },
-                {
-                  type: 'fill_gap', label: 'Вставка',
-                  pool: [
-                    { prompt: '___ you work every day?', answer: 'Do', hint: 'Do / Does' },
-                    { prompt: '___ he read books?', answer: 'Does', hint: 'Do / Does' },
-                    { prompt: '___ she write letters?', answer: 'Does', hint: 'Do / Does' },
-                    { prompt: '___ they play football?', answer: 'Do', hint: 'Do / Does' },
-                    { prompt: '___ you speak English?', answer: 'Do', hint: 'Do / Does' },
-                    { prompt: '___ the cat sleep here?', answer: 'Does', hint: 'Do / Does' },
-                    { prompt: '___ the dog run fast?', answer: 'Does', hint: 'Do / Does' },
-                    { prompt: '___ you like coffee?', answer: 'Do', hint: 'Do / Does' },
-                    { prompt: '___ she cook dinner?', answer: 'Does', hint: 'Do / Does' },
-                    { prompt: '___ he drive a car?', answer: 'Does', hint: 'Do / Does' },
-                    { prompt: '___ birds sing in the morning?', answer: 'Do', hint: 'Do / Does' },
-                  ],
-                },
-                {
-                  type: 'choice', label: 'Выбор формы',
-                  pool: [
-                    { prompt: '___ you work? a) Do  b) Does', answer: 'Do' },
-                    { prompt: '___ he read? a) Do  b) Does', answer: 'Does' },
-                    { prompt: '___ she write? a) Do  b) Does', answer: 'Does' },
-                    { prompt: '___ they play? a) Do  b) Does', answer: 'Do' },
-                    { prompt: '___ it rain here? a) Do  b) Does', answer: 'Does' },
-                    { prompt: '___ we go? a) Do  b) Does', answer: 'Do' },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        // A2 and B1 can be added later with more grid cells
-      ],
-    },
-  };
 
-  function initExercises() {
-    if (typeof COURSE_EXERCISES === 'undefined') return;
-    var levels = COURSE_DATA.en.levels;
-    for (var li = 0; li < levels.length; li++) {
-      var units = levels[li].units;
-      for (var ui = 0; ui < units.length; ui++) {
-        var unit = units[ui];
-        var blocks = unit.blocks;
-        for (var bi = 0; bi < blocks.length; bi++) {
-          var block = blocks[bi];
-          var key = unit.cellId + '-' + block.type;
-          if (COURSE_EXERCISES[key]) {
-            block.pool = COURSE_EXERCISES[key];
-          }
-        }
-      }
-    }
-  }
 
   function getDefaultPerLang(lang) {
     return {
@@ -623,19 +351,9 @@
       bestSpeed: 0,
       bestAccuracy: 0,
       totalCharsTyped: 0,
-      courseActive: false,
-      courseLevel: 0,
-      courseUnit: 0,
-      courseBlock: 0,
-      courseBlockExIdx: 0,
-      courseBlockExOrder: [],
-      courseBlockPool: [],
-      courseBlockCount: 0,
-      courseHidePrompt: false,
-      courseTheoryRead: false,
-      courseDataVersion: 4,
-      courseLevelCompleted: -1,
-      courseShowingWords: false,
+      history: [],
+      keyPresses: 0,
+
     };
   }
 
@@ -649,10 +367,8 @@
       consecutiveReq: 5,
       textLength: 50,
       uiScale: 100,
-      sessionTimeout: 30,
       showKeyboard: true,
-      courseIgnoreCase: true,
-      courseIgnorePunct: true,
+      theme: 'dark',
     };
     for (const lng of langs) state[lng] = getDefaultPerLang(lng);
     return state;
@@ -668,8 +384,13 @@
   let isComplete = false;
   let charStatus = [];
   let inlineEditingTarget = null;
-  let authUsers = {};
-  let authCurrentUser = null;
+  let ysdk = null;
+  let playerData = null;
+  let saveDebounceTimer = null;
+  let isOfflineMode = false;
+  let authToken = null;
+  let authUser = null;
+  const API_HOST = '';
 
   const textDisplay = document.getElementById('textDisplay');
   const progressBar = document.getElementById('progressBar');
@@ -713,6 +434,12 @@
   const statBestAccuracy = document.getElementById('statBestAccuracy');
   const statUnlockedLetters = document.getElementById('statUnlockedLetters');
   const statCurrentStage = document.getElementById('statCurrentStage');
+  const statTabs = document.querySelectorAll('.stat-tab');
+  const statPanels = document.querySelectorAll('.stat-panel');
+  const historyList = document.getElementById('historyList');
+  const chartSpeed = document.getElementById('chartSpeed');
+  const chartAccuracy = document.getElementById('chartAccuracy');
+  const chartProgress = document.getElementById('chartProgress');
   const lrSpeed = document.getElementById('lrSpeed');
   const lrSpeedDelta = document.getElementById('lrSpeedDelta');
   const lrAccuracy = document.getElementById('lrAccuracy');
@@ -722,59 +449,27 @@
   const textLengthInput = document.getElementById('textLengthInput');
   const scaleInput = document.getElementById('scaleInput');
   const scaleLabel = document.getElementById('scaleLabel');
-  const keyboardToggle = document.getElementById('keyboardToggle');
   const showKeyboardChk = document.getElementById('showKeyboardChk');
-  const authOverlay = document.getElementById('authOverlay');
-  const authNameInput = document.getElementById('authNameInput');
-  const authPhraseInput = document.getElementById('authPhraseInput');
-  const authPhraseCounter = document.getElementById('authPhraseCounter');
-  const authLoginBtn = document.getElementById('authLoginBtn');
-  const authRegisterBtn = document.getElementById('authRegisterBtn');
-  const authMsg = document.getElementById('authMsg');
-  const switchUserBtn = document.getElementById('switchUserBtn');
-  const authMigrateNotice = document.getElementById('authMigrateNotice');
-  const authUserInfo = document.getElementById('authUserInfo');
-  const authCurrentUserName = document.getElementById('authCurrentUserName');
-  const authLogoutBtn = document.getElementById('authLogoutBtn');
-  const sessionTimeoutInput = document.getElementById('sessionTimeoutInput');
-  const modeToggleBtn = document.getElementById('modeToggleBtn');
-  const courseLevelDisplay = document.getElementById('courseLevelDisplay');
+  const themeSelect = document.getElementById('themeSelect');
   const mainTitle = document.getElementById('mainTitle');
   const nextLetterHint = document.getElementById('nextLetterHint');
-  const courseArea = document.getElementById('courseArea');
-  const courseQuestion = document.getElementById('courseQuestion');
-  const courseFeedback = document.getElementById('courseFeedback');
-  const courseInput = document.getElementById('courseInput');
-  const courseSubmit = document.getElementById('courseSubmit');
-  const courseNext = document.getElementById('courseNext');
-  const courseWords = document.getElementById('courseWords');
-  const courseIgnoreCaseChk = document.getElementById('courseIgnoreCase');
-  const courseIgnorePunctChk = document.getElementById('courseIgnorePunct');
-  const courseIgnoreCaseQuick = document.getElementById('courseIgnoreCaseQuick');
-  const courseIgnorePunctQuick = document.getElementById('courseIgnorePunctQuick');
-  const courseTheory = document.getElementById('courseTheory');
-  const courseTheoryBtn = document.getElementById('courseTheoryBtn');
-  const courseCountSelector = document.getElementById('courseCountSelector');
-  const courseHidePromptChk = document.getElementById('courseHidePrompt');
   const speedStat = document.getElementById('speedStat');
   const accuracyStat = document.getElementById('accuracyStat');
   const targetSpeedItem = document.getElementById('targetSpeedItem');
   const targetAccuracyItem = document.getElementById('targetAccuracyItem');
   const lastResultCard = document.getElementById('lastResultCard');
-  const courseProgress = document.getElementById('courseProgress');
-  const courseProgressBar = document.getElementById('courseProgressBar');
-  const courseStepSelector = document.getElementById('courseStepSelector');
-  const courseProgressText = document.getElementById('courseProgressText');
   const sideCardTitle = document.getElementById('sideCardTitle');
   const sideCardLabel = document.getElementById('sideCardLabel');
   const sideCardSub = document.getElementById('sideCardSub');
   const sidePanel = document.querySelector('.side-panel');
   const lessonStat = document.getElementById('lessonStat');
+  const keyPressCounter = document.getElementById('keyPressCounter');
+  const keyPressValue = document.getElementById('keyPressValue');
+  const keyPressLang = document.getElementById('keyPressLang');
 
-  function populateLangSelect(courseOnly) {
+  function populateLangSelect() {
     langSelect.innerHTML = '';
     for (const key of Object.keys(LANG_DATA)) {
-      if (courseOnly && !COURSE_DATA[key]) continue;
       const opt = document.createElement('option');
       opt.value = key;
       opt.textContent = LANG_DATA[key].name;
@@ -795,465 +490,7 @@
       : null;
   }
 
-  function isCourseMode() {
-    const c = cur();
-    return c.courseActive && COURSE_DATA[state.language] &&
-      c.courseLevel < COURSE_DATA[state.language].levels.length;
-  }
-  window.isCourseMode = isCourseMode;
 
-  function getCurrentLevel() {
-    if (!isCourseMode()) return null;
-    return COURSE_DATA[state.language].levels[cur().courseLevel];
-  }
-  window.getCurrentLevel = getCurrentLevel;
-
-  function getCurrentUnit() {
-    const level = getCurrentLevel();
-    if (!level) return null;
-    const c = cur();
-    if (c.courseUnit >= level.units.length) return null;
-    return level.units[c.courseUnit];
-  }
-
-  function getCurrentBlock() {
-    const unit = getCurrentUnit();
-    if (!unit) return null;
-    const c = cur();
-    if (c.courseBlock >= unit.blocks.length) return null;
-    return unit.blocks[c.courseBlock];
-  }
-
-  function getGridCell(cellId) {
-    const grid = COURSE_DATA[state.language] && COURSE_DATA[state.language].gridCells;
-    if (!grid) return null;
-    return grid.find(c => c.id === cellId) || null;
-  }
-
-  let courseExIdx = 0;
-  let courseExOrder = [];
-  // Course runtime state
-  let courseBlockPool = [];
-
-  function shuffleArr(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
-
-  function renderCourseExercise() {
-    const unit = getCurrentUnit();
-    const block = getCurrentBlock();
-    const c = cur();
-    if (!unit || !block) return;
-
-    const exs = courseBlockPool;
-    const idx = c.courseBlockExIdx;
-    if (idx >= exs.length) {
-      // Block finished — advance to next block
-      c.courseBlock++;
-      c.courseBlockExIdx = 0;
-      c.courseBlockExOrder = [];
-      c.courseBlockPool = [];
-      courseBlockPool = [];
-      saveState();
-      renderCourseContent();
-      return;
-    }
-
-    const ex = exs[idx];
-    const gridCell = getGridCell(unit.cellId);
-    const cellLabel = gridCell ? gridCell.tense + ' · ' + gridCell.type : '';
-
-    // Build question display
-    let html = '';
-    const hidePrompt = c.courseHidePrompt || false;
-    if (block.type === 'translate') {
-      html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Переведи на английский</div>';
-      html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
-    } else if (block.type === 'build') {
-      html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Собери предложение</div>';
-      html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
-    } else if (block.type === 'fill_gap') {
-      html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Вставь пропущенное слово</div>';
-      html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
-    } else if (block.type === 'choice') {
-      html = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:4px">Выбери правильную форму</div>';
-      html += '<div style="font-size:1.5rem">' + ex.prompt + '</div>';
-    }
-
-    // Word chips as hints (from answer for all types)
-    if (!hidePrompt) {
-      const words = ex.answer.split(/\s+/).filter(w => w.length > 0);
-      const unique = [];
-      const seen = {};
-      for (const w of words) {
-        const key = w.replace(/[.,!?;:'"()\[\]{}\-]/g, '').toLowerCase();
-        if (key && !seen[key]) {
-          seen[key] = true;
-          unique.push(w);
-        }
-      }
-      if (unique.length > 1) {
-        const shuffled = shuffleArr(unique.slice());
-        courseWords.innerHTML = shuffled.map(w => '<span class="course-word-chip">' + w + '</span>').join(' ');
-      } else {
-        courseWords.innerHTML = '';
-      }
-    } else {
-      courseWords.innerHTML = '';
-    }
-
-    if (ex.hint) {
-      html += '<div style="margin-top:8px;font-size:0.85rem;opacity:0.5">💡 ' + ex.hint + '</div>';
-    }
-
-    courseQuestion.innerHTML = html;
-    courseFeedback.style.display = 'none';
-    courseFeedback.className = 'course-feedback';
-    courseInput.value = '';
-    courseInput.className = 'course-input';
-    courseInput.readOnly = false;
-    courseInput.disabled = false;
-    courseInput.focus();
-    courseSubmit.disabled = false;
-    courseSubmit.textContent = 'Проверить';
-    courseNext.style.display = 'none';
-    courseIgnoreCaseQuick.checked = state.courseIgnoreCase !== false;
-    courseIgnorePunctQuick.checked = state.courseIgnorePunct !== false;
-    courseHidePromptChk.checked = c.courseHidePrompt || false;
-    // Update progress bar
-    courseProgress.style.display = 'flex';
-    courseProgressBar.style.width = ((idx + 1) / exs.length * 100) + '%';
-    courseProgressText.textContent = (idx + 1) + '/' + exs.length;
-    updateCourseKeyboard();
-    updateStats();
-    updateCourseDisplay();
-  }
-
-  function renderCourseContent() {
-    const level = getCurrentLevel();
-    const unit = getCurrentUnit();
-    const block = getCurrentBlock();
-    const c = cur();
-
-    if (!level) {
-      // No more levels — done
-      c.courseActive = false;
-      saveState();
-      showModal('Курс пройден!', 'Вы завершили все уровни!');
-      renderText();
-      return;
-    }
-
-    if (!unit) {
-      // No more units in this level — mark completed, go to next level
-      if (c.courseLevel > c.courseLevelCompleted) c.courseLevelCompleted = c.courseLevel;
-      c.courseLevel++;
-      c.courseUnit = 0;
-      c.courseBlock = 0;
-      c.courseBlockExIdx = 0;
-      c.courseBlockExOrder = [];
-      c.courseBlockPool = [];
-      c.courseTheoryRead = false;
-      courseBlockPool = [];
-      saveState();
-      if (c.courseLevel >= COURSE_DATA[state.language].levels.length) {
-        c.courseActive = false;
-        saveState();
-        showModal('Курс пройден!', 'Вы завершили все уровни!');
-        renderText();
-        return;
-      }
-      const nextLevel = COURSE_DATA[state.language].levels[c.courseLevel];
-      showModal('Уровень ' + level.id + ' пройден!',
-        'Переходим к уровню <strong>' + nextLevel.id + ' — ' + nextLevel.name + '</strong>');
-      renderLetters();
-      updateStats();
-      updateCourseDisplay();
-      renderCourseContent();
-      return;
-    }
-
-    if (!block) {
-      // No more blocks in this unit — next unit
-      c.courseUnit++;
-      c.courseBlock = 0;
-      c.courseBlockExIdx = 0;
-      c.courseBlockExOrder = [];
-      c.courseBlockPool = [];
-      courseBlockPool = [];
-      c.courseTheoryRead = false;
-      saveState();
-      renderCourseContent();
-      return;
-    }
-
-    // Show step selector
-    c.courseShowingWords = false;
-    renderCourseStepSelector();
-
-    // Show theory first if not read
-    if (!c.courseTheoryRead) {
-      courseProgress.style.display = 'none';
-      updateCourseKeyboard();
-      courseQuestion.style.display = 'none';
-      courseInput.style.display = 'none';
-      courseSubmit.style.display = 'none';
-      courseNext.style.display = 'none';
-      courseCountSelector.style.display = 'none';
-      courseWords.style.display = 'none';
-      courseTheory.style.display = 'block';
-
-      const gridCell = getGridCell(unit.cellId);
-      let theoryHtml = '';
-      if (gridCell) {
-        theoryHtml = '<div style="font-size:0.85rem;opacity:0.5;margin-bottom:8px">' +
-          gridCell.tense + ' · ' + gridCell.type + ' → ' + block.label + '</div>';
-      }
-      theoryHtml += unit.theory;
-      courseTheory.innerHTML = theoryHtml;
-      courseTheoryBtn.style.display = '';
-      renderCourseStepSelector();
-      return;
-    }
-
-    // Show count selector if this is the first exercise in the block
-    if (c.courseBlockExIdx === 0 && !courseBlockPool.length) {
-      // If we have a saved pool from a previous session, restore it
-      if (c.courseBlockPool && c.courseBlockPool.length) {
-        courseBlockPool = c.courseBlockPool;
-      } else {
-        courseProgress.style.display = 'none';
-        updateCourseKeyboard();
-        courseTheory.style.display = 'none';
-        courseTheoryBtn.style.display = 'none';
-        courseQuestion.style.display = 'none';
-        courseInput.style.display = 'none';
-        courseSubmit.style.display = 'none';
-        courseNext.style.display = 'none';
-        courseWords.style.display = 'none';
-        courseCountSelector.style.display = 'flex';
-
-        const gridCell = getGridCell(unit.cellId);
-        courseCountSelector.innerHTML = '<span style="margin-right:8px">' +
-          block.label + ' — сколько примеров:</span>' +
-          '<button class="btn-sm" data-count="10">10</button>' +
-          '<button class="btn-sm" data-count="20">20</button>' +
-          '<button class="btn-sm" data-count="30">30</button>' +
-          '<button class="btn-sm" data-count="0">Все (' + block.pool.length + ')</button>';
-
-        const prevCount = c.courseBlockCount || 0;
-        courseCountSelector.querySelectorAll('.btn-sm').forEach(function (btn) {
-          if (parseInt(btn.dataset.count) === prevCount) btn.classList.add('active');
-          btn.addEventListener('click', function () {
-            const chosen = parseInt(this.dataset.count);
-            startCourseBlock(chosen);
-          });
-        });
-        renderCourseStepSelector();
-        return;
-      }
-    }
-
-    // Show exercise
-    courseTheory.style.display = 'none';
-    courseTheoryBtn.style.display = 'none';
-    courseCountSelector.style.display = 'none';
-    courseQuestion.style.display = '';
-    courseInput.style.display = '';
-    courseSubmit.style.display = '';
-    courseWords.style.display = '';
-    renderCourseExercise();
-  }
-
-  function renderCourseWordList() {
-    const unit = getCurrentUnit();
-    const c = cur();
-    c.courseShowingWords = true;
-    // Collect all unique prompt→answer pairs from all blocks
-    const allPairs = [];
-    const seen = {};
-    for (let bi = 0; bi < unit.blocks.length; bi++) {
-      const pool = unit.blocks[bi].pool || [];
-      for (let pi = 0; pi < pool.length; pi++) {
-        const ex = pool[pi];
-        const key = ex.prompt + ' ||| ' + ex.answer;
-        if (!seen[key]) {
-          seen[key] = true;
-          allPairs.push({ prompt: ex.prompt, answer: ex.answer });
-        }
-      }
-    }
-
-    courseTheory.style.display = 'none';
-    courseTheoryBtn.style.display = 'none';
-    courseCountSelector.style.display = 'none';
-    courseQuestion.style.display = 'none';
-    courseFeedback.style.display = 'none';
-    courseInput.style.display = 'none';
-    courseSubmit.style.display = 'none';
-    courseNext.style.display = 'none';
-    courseWords.style.display = 'none';
-    courseProgress.style.display = 'none';
-
-    let html = '<div class="course-word-list"><div style="font-size:0.85rem;opacity:0.5;margin-bottom:8px">Фразы для изучения — ' + allPairs.length + '</div>';
-    for (let i = 0; i < allPairs.length; i++) {
-      html += '<div class="word-pair"><span class="word-rus">' + allPairs[i].prompt + '</span> <span class="word-arrow">→</span> <span class="word-eng">' + allPairs[i].answer + '</span></div>';
-    }
-    html += '</div>';
-    courseQuestion.innerHTML = html;
-    courseQuestion.style.display = '';
-  }
-
-  function renderCourseStepSelector() {
-    if (!isCourseMode()) { courseStepSelector.style.display = 'none'; return; }
-    const block = getCurrentBlock();
-    const c = cur();
-    const steps = ['Правила', 'Слова', 'Сборка', 'Вставка', 'Выбор формы'];
-    const blockMap = [-1, -2, 0, 1, 2];
-    let html = '';
-    for (let si = 0; si < steps.length; si++) {
-      const isTheory = si === 0;
-      const stepBlock = blockMap[si];
-      const isActive = isTheory ? (!c.courseTheoryRead) : (stepBlock === -2 ? c.courseShowingWords : (block && c.courseBlock === stepBlock));
-      const cls = isActive ? 'course-step-btn active' : 'course-step-btn';
-      html += '<button class="' + cls + '" data-step="' + stepBlock + '">' + steps[si] + '</button>';
-    }
-    courseStepSelector.innerHTML = html;
-    courseStepSelector.style.display = 'flex';
-    courseStepSelector.querySelectorAll('.course-step-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        const step = parseInt(this.dataset.step, 10);
-        if (step === -1) {
-          // Show theory
-          c.courseTheoryRead = false;
-          c.courseShowingWords = false;
-          courseStepSelector.innerHTML = '';
-          renderCourseContent();
-        } else if (step === -2) {
-          // Show word list
-          c.courseBlock = 0;
-          renderCourseWordList();
-          renderCourseStepSelector();
-        } else {
-          c.courseBlock = step;
-          c.courseBlockExIdx = 0;
-          c.courseBlockPool = [];
-          courseBlockPool = [];
-          c.courseTheoryRead = true;
-          c.courseShowingWords = false;
-          courseStepSelector.innerHTML = '';
-          renderCourseContent();
-        }
-      });
-    });
-  }
-
-  function startCourseBlock(chosenCount) {
-    const block = getCurrentBlock();
-    const c = cur();
-    if (!block) return;
-
-    const pool = block.pool;
-    const count = chosenCount === 0 ? pool.length : chosenCount;
-
-    c.courseBlockCount = chosenCount;
-    const shuffled = shuffleArr(pool.slice());
-    const selected = [];
-    while (selected.length < count) {
-      for (const ex of shuffled) {
-        if (selected.length >= count) break;
-        selected.push(ex);
-      }
-    }
-    courseBlockPool = selected;
-    c.courseBlockPool = selected;
-    c.courseBlockExOrder = selected.map(function (_, i) { return i; });
-    c.courseBlockExIdx = 0;
-    c.courseBlockExIdx = 0;
-    saveState();
-
-    renderCourseContent();
-  }
-
-  function normalizeAnswer(str, ignoreCase, ignorePunct) {
-    let s = str.trim();
-    if (ignorePunct) {
-      s = s.replace(/[.,!?;:'"()\[\]{}\-]/g, ' ').replace(/\s+/g, ' ').trim();
-    }
-    if (ignoreCase) {
-      s = s.toLowerCase();
-    }
-    return s;
-  }
-
-  function checkAnswer() {
-    const block = getCurrentBlock();
-    const c = cur();
-    if (!block) return;
-    const exs = courseBlockPool;
-    const idx = c.courseBlockExIdx;
-    if (idx >= exs.length) return;
-    const ex = exs[idx];
-    const ignoreCase = state.courseIgnoreCase !== false;
-    const ignorePunct = state.courseIgnorePunct !== false;
-    const user = normalizeAnswer(courseInput.value, ignoreCase, ignorePunct);
-    const correct = normalizeAnswer(ex.answer, ignoreCase, ignorePunct);
-    if (user === correct) {
-      courseFeedback.textContent = '✅ Верно!';
-      courseFeedback.className = 'course-feedback correct';
-      courseInput.className = 'course-input correct';
-      courseInput.readOnly = true;
-      courseSubmit.disabled = true;
-      courseNext.style.display = '';
-      saveState();
-    } else {
-      courseFeedback.innerHTML = '❌ Неверно. Правильный ответ: <strong>' + ex.answer + '</strong>';
-      courseFeedback.className = 'course-feedback incorrect';
-      courseInput.className = 'course-input incorrect';
-      courseInput.readOnly = false;
-      courseInput.disabled = false;
-      courseSubmit.disabled = false;
-      courseInput.focus();
-      courseInput.select();
-    }
-    courseFeedback.style.display = '';
-  }
-
-  courseSubmit.addEventListener('click', checkAnswer);
-  courseInput.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-      if (courseNext.style.display !== 'none') {
-        courseNext.click();
-      } else {
-        checkAnswer();
-      }
-    }
-  });
-  courseInput.addEventListener('input', updateCourseKeyboard);
-  courseNext.addEventListener('click', function () {
-    const c = cur();
-    c.courseBlockExIdx++;
-    saveState();
-    renderCourseContent();
-  });
-  courseTheoryBtn.addEventListener('click', function () {
-    const c = cur();
-    c.courseTheoryRead = true;
-    saveState();
-    renderCourseContent();
-  });
-  courseHidePromptChk.addEventListener('change', function () {
-    const c = cur();
-    c.courseHidePrompt = courseHidePromptChk.checked;
-    saveState();
-    renderCourseExercise();
-  });
-  courseIgnoreCaseQuick.addEventListener('change', function () {
-    state.courseIgnoreCase = courseIgnoreCaseQuick.checked;
-    courseIgnoreCaseChk.checked = courseIgnoreCaseQuick.checked;
-  });
-  courseIgnorePunctQuick.addEventListener('change', function () {
-    state.courseIgnorePunct = courseIgnorePunctQuick.checked;
-    courseIgnorePunctChk.checked = courseIgnorePunctQuick.checked;
-  });
 
   function getFilteredWords() {
     const unlocked = getUnlockedLetters();
@@ -1315,16 +552,6 @@
     textChars = [];
     charStatus = [];
 
-    const course = isCourseMode();
-    if (course) {
-      document.querySelector('.practice-area').style.display = 'none';
-      courseArea.style.display = 'flex';
-      renderCourseContent();
-      return;
-    }
-    document.querySelector('.practice-area').style.display = '';
-    courseArea.style.display = 'none';
-
     let text = generateText();
     let hint = '';
 
@@ -1356,54 +583,6 @@
 
   function renderLetters() {
     lettersGrid.innerHTML = '';
-    if (isCourseMode()) {
-      lettersGrid.classList.remove('compact');
-      unlockedCount.textContent = '';
-      totalCount.textContent = '';
-      nextLetter.textContent = '';
-      nextLetterHint.style.display = 'none';
-      const level = getCurrentLevel();
-      const c = cur();
-      const allLevels = COURSE_DATA[state.language].levels;
-      let selHtml = '<select id="courseLevelSelect" style="background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:2px 4px;font-size:0.8rem;max-width:100%">';
-      for (let li = 0; li < allLevels.length; li++) {
-        const lv = allLevels[li];
-        const completed = li <= c.courseLevelCompleted;
-        const current = li === c.courseLevel;
-        const locked = li > c.courseLevelCompleted + 1;
-        const prefix = completed ? '✓ ' : (current ? '▶ ' : '🔒 ');
-        selHtml += '<option value="' + li + '"' +
-          (current ? ' selected' : '') +
-          (locked ? ' disabled' : '') +
-          '>' + prefix + lv.id + ' · ' + lv.name + '</option>';
-      }
-      selHtml += '</select>';
-      sideCardLabel.innerHTML = selHtml;
-      const sel = sideCardLabel.querySelector('#courseLevelSelect');
-      if (sel) {
-        sel.addEventListener('change', function () {
-          const newLevel = parseInt(sel.value, 10);
-          if (newLevel === c.courseLevel) return;
-          if (newLevel > c.courseLevelCompleted + 1) return;
-          c.courseLevel = newLevel;
-          c.courseUnit = 0;
-          c.courseBlock = 1;
-          c.courseBlockExIdx = 0;
-          c.courseBlockPool = [];
-          c.courseTheoryRead = false;
-          courseBlockPool = [];
-          saveState();
-          renderLetters();
-          renderCourseContent();
-        });
-      }
-      sideCardLabel.title = '';
-      sideCardLabel.style.cursor = '';
-      sideCardSub.style.display = 'none';
-      sidePanel.classList.add('course-active');
-      renderCourseGrid();
-      return;
-    }
     const order = langData().letterOrder;
     lettersGrid.classList.toggle('compact', order.length > 40);
     nextLetterHint.style.display = '';
@@ -1411,7 +590,6 @@
     sideCardLabel.style.cursor = '';
     sideCardLabel.title = '';
     sideCardSub.style.display = '';
-    sidePanel.classList.remove('course-active');
     for (let i = 0; i < order.length; i++) {
       const ch = order[i];
       const tile = document.createElement('div');
@@ -1452,62 +630,7 @@
     }
   }
 
-  function renderCourseGrid() {
-    const level = getCurrentLevel();
-    if (!level) return;
-    const cells = COURSE_DATA[state.language].gridCells;
-    const rowLabels = ['Present Simple', 'Past Simple', 'Future Simple'];
-    const colLabels = ['Утверждение', 'Отрицание', 'Вопрос'];
 
-    let html = '<div class="course-grid">';
-    for (let r = 0; r < 3; r++) {
-      html += '<div class="course-grid-row">';
-      for (let c = 0; c < 3; c++) {
-        const cell = cells.find(function (g) { return g.row === r && g.col === c; });
-        if (!cell) continue;
-        const unitIdx = level.units.findIndex(function (u) { return u.cellId === cell.id; });
-        let status = 'locked';
-        if (unitIdx >= 0) {
-          if (unitIdx < cur().courseUnit) status = 'completed';
-          else if (unitIdx === cur().courseUnit) status = 'current';
-        }
-        // Build tree tooltip
-        let tree = level.id + ' · ' + rowLabels[r] + ' · ' + colLabels[c];
-        if (unitIdx >= 0) {
-          const unit = level.units[unitIdx];
-          for (let bi = 0; bi < unit.blocks.length; bi++) {
-            const b = unit.blocks[bi];
-            tree += '\n├─ ' + (bi + 1) + '. ' + b.label + ' (' + b.pool.length + ')';
-          }
-        }
-        html += '<div class="course-grid-cell ' + status + '" data-tree="' + tree.replace(/"/g, '&quot;') + '">' +
-          '<span class="cell-label">' + rowLabels[r] + '</span>' +
-          '<span class="cell-sub">' + colLabels[c] + '</span>' +
-          '</div>';
-      }
-      html += '</div>';
-    }
-    html += '</div>';
-    lettersGrid.innerHTML = html;
-    // Tooltip on hover via data-tree (clean up old tooltip first)
-    var oldTooltip = document.querySelector('.course-grid-tooltip');
-    if (oldTooltip) oldTooltip.parentNode.removeChild(oldTooltip);
-    var tooltipEl = document.createElement('div');
-    tooltipEl.className = 'course-grid-tooltip';
-    tooltipEl.style.cssText = 'display:none;position:fixed;background:#1a1a2e;color:#ccc;font-size:0.7rem;line-height:1.6;white-space:pre;padding:8px 12px;border-radius:8px;border:1px solid #333;box-shadow:0 4px 16px rgba(0,0,0,0.6);z-index:10000;pointer-events:none;font-family:Segoe UI,sans-serif';
-    document.body.appendChild(tooltipEl);
-    lettersGrid.querySelectorAll('.course-grid-cell').forEach(function (cell) {
-      cell.addEventListener('mouseenter', function (e) {
-        var tree = cell.getAttribute('data-tree');
-        if (tree) { tooltipEl.textContent = tree; tooltipEl.style.display = 'block'; }
-      });
-      cell.addEventListener('mousemove', function (e) {
-        tooltipEl.style.left = (e.clientX + 12) + 'px';
-        tooltipEl.style.top = (e.clientY - 10) + 'px';
-      });
-      cell.addEventListener('mouseleave', function () { tooltipEl.style.display = 'none'; });
-    });
-  }
 
   function renderKeyboard() {
     keyboard.innerHTML = '';
@@ -1541,40 +664,19 @@
     }
   }
 
-  function updateCourseKeyboard() {
-    const keys = keyboard.querySelectorAll('.key');
-    keys.forEach(k => k.classList.remove('course-key', 'current-key'));
-    if (!isCourseMode()) return;
-    const exs = courseBlockPool;
-    const idx = cur().courseBlockExIdx;
-    if (!exs || idx >= exs.length) return;
-    const answer = exs[idx].answer;
-    // Green highlight: all unique chars in the answer
-    const chars = new Set();
-    for (const ch of answer.toLowerCase()) {
-      if (ch === ' ') continue;
-      const mapped = SHIFT_MAP[ch] || ch;
-      chars.add(mapped);
-    }
-    for (const ch of chars) {
-      const target = keyboard.querySelector('.key[data-char="' + ch + '"]');
-      if (target) target.classList.add('course-key');
-    }
-    // Blue highlight: next expected character
-    const typed = courseInput.value;
-    let nextIdx = typed.length;
-    while (nextIdx < answer.length && answer[nextIdx] === ' ') nextIdx++;
-    if (nextIdx < answer.length) {
-      const nextCh = answer[nextIdx].toLowerCase();
-      const mapped = SHIFT_MAP[nextCh] || nextCh;
-      const target = keyboard.querySelector('.key[data-char="' + mapped + '"]');
-      if (target) target.classList.add('current-key');
-    }
-  }
+
 
   function updateProgress() {
     if (textChars.length === 0) return;
     progressBar.style.width = Math.min((currentIndex / textChars.length) * 100, 100) + '%';
+  }
+
+  function updateKeyPressDisplay() {
+    if (!keyPressCounter || !keyPressValue || !keyPressLang) return;
+    const c = cur();
+    keyPressValue.textContent = c.keyPresses.toLocaleString();
+    const names = { ru: 'RU', en: 'EN', py: 'PY', java: 'JAVA', html: 'HTML', php: 'PHP', js: 'JS', sql: 'SQL' };
+    keyPressLang.textContent = names[state.language] || state.language.toUpperCase();
   }
 
   function updateStats() {
@@ -1585,39 +687,22 @@
 
     speedDisplay.textContent = speed;
     accuracyDisplay.textContent = accuracy + '%';
-    if (isCourseMode()) {
-      const block = getCurrentBlock();
-      const total = block ? block.pool.length : '—';
-      const done = block ? Math.min(cur().courseBlockExIdx + 1, block.pool.length) : 0;
-      lessonDisplay.textContent = done + '/' + total;
-      streakDisplay.textContent = '';
-      lessonStat.style.display = 'none';
-      speedStat.style.display = 'none';
-      accuracyStat.style.display = 'none';
-      streakStat.style.display = 'none';
-      targetSpeedItem.style.display = 'none';
-      targetAccuracyItem.style.display = 'none';
-      targetStreakItem.style.display = 'none';
-      lastResultCard.style.display = 'none';
-      speedDisplay.textContent = '—';
-      accuracyDisplay.textContent = '—';
-    } else {
-      lessonDisplay.textContent = cur().lessonsDone + '/' + state.dailyGoal;
-      streakDisplay.textContent = cur().consecutivePasses + '/' + state.consecutiveReq;
-      lessonStat.style.display = '';
-      speedStat.style.display = '';
-      accuracyStat.style.display = '';
-      streakStat.style.display = '';
-      targetSpeedItem.style.display = '';
-      targetAccuracyItem.style.display = '';
-      targetStreakItem.style.display = '';
-      lastResultCard.style.display = '';
-    }
+    lessonDisplay.textContent = cur().lessonsDone + '/' + state.dailyGoal;
+    streakDisplay.textContent = cur().consecutivePasses + '/' + state.consecutiveReq;
+    lessonStat.style.display = '';
+    speedStat.style.display = '';
+    accuracyStat.style.display = '';
+    streakStat.style.display = '';
+    targetSpeedItem.style.display = '';
+    targetAccuracyItem.style.display = '';
+    targetStreakItem.style.display = '';
+    lastResultCard.style.display = '';
     if (inlineEditingTarget !== 'targetSpeed') targetSpeed.textContent = state.speedReq;
     if (inlineEditingTarget !== 'targetAccuracy') targetAccuracy.textContent = Math.round(state.accuracyReq * 100);
     if (inlineEditingTarget !== 'targetStreak') targetStreak.textContent = state.consecutiveReq;
     langSelect.value = state.language;
 
+    updateKeyPressDisplay();
     updateLastResult();
   }
 
@@ -1673,7 +758,7 @@
         state[lng].lastDate = today;
       }
     }
-    saveState();
+    debouncedSaveState();
   }
 
   function trackCharStat(ch, correct) {
@@ -1692,94 +777,6 @@
     return s.i / (s.c + s.i);
   }
 
-  let _lastActivity = 0;
-
-  function saveState() {
-    try {
-      if (authCurrentUser && authUsers[authCurrentUser]) {
-        authUsers[authCurrentUser].state = state;
-      }
-      localStorage.setItem(AUTH_KEY, JSON.stringify({ users: authUsers, currentUser: authCurrentUser, lastActivity: _lastActivity || Date.now() }));
-    } catch (e) {}
-  }
-
-  function loadState() {
-    try {
-      const data = localStorage.getItem(AUTH_KEY);
-      if (data) {
-        const parsed = JSON.parse(data);
-        if (parsed && parsed.users) {
-          authUsers = parsed.users;
-          const savedUser = parsed.currentUser || null;
-          const lastActivity = parsed.lastActivity || 0;
-          if (savedUser && authUsers[savedUser]) {
-            const timeout = (authUsers[savedUser].state && authUsers[savedUser].state.sessionTimeout != null)
-              ? authUsers[savedUser].state.sessionTimeout : 30;
-            if (Date.now() - lastActivity < timeout * 60 * 1000) {
-              authCurrentUser = savedUser;
-              _lastActivity = lastActivity;
-              return authUsers[savedUser].state;
-            }
-          }
-        }
-      }
-    } catch (e) { console.warn('loadState error:', e); }
-
-    migrateOldUsers();
-    authCurrentUser = null;
-    _lastActivity = 0;
-    return getDefaultState();
-  }
-
-  function trackActivity() {
-    _lastActivity = Date.now();
-    try {
-      const data = JSON.parse(localStorage.getItem(AUTH_KEY) || '{}');
-      data.lastActivity = _lastActivity;
-      if (authCurrentUser) data.currentUser = authCurrentUser;
-      localStorage.setItem(AUTH_KEY, JSON.stringify(data));
-    } catch (e) {}
-  }
-
-  function handleLogout() {
-    if (isActive && currentIndex > 0 && !isComplete) {
-      if (!confirm('Выйти? Текущий текст будет потерян.')) return;
-    }
-    authCurrentUser = null;
-    _lastActivity = 0;
-    state = getDefaultState();
-    try {
-      const data = JSON.parse(localStorage.getItem(AUTH_KEY) || '{}');
-      data.currentUser = null;
-      data.lastActivity = 0;
-      localStorage.setItem(AUTH_KEY, JSON.stringify(data));
-    } catch (e) {}
-    switchUserBtn.textContent = 'Вход';
-    renderKeyboard();
-    renderLetters();
-    renderText();
-    updateStats();
-    updateCourseDisplay();
-    showAuthOverlay();
-  }
-  window.handleLogout = handleLogout;
-
-  function migrateOldUsers() {
-    if (Object.keys(authUsers).length > 0) return;
-    try {
-      const old = localStorage.getItem('typingTrainerState');
-      if (old) {
-        const st = JSON.parse(old);
-        if (st && st.ru) {
-          const phrase = "Klaviatura123!";
-          authUsers['По умолчанию'] = { phrase: phrase, state: st, _first: true };
-          localStorage.removeItem('typingTrainerState');
-          saveState();
-        }
-      }
-    } catch (e) {}
-  }
-
   function ensureStateStructure(raw) {
     if (!raw || typeof raw !== 'object') return getDefaultState();
     const def = getDefaultState();
@@ -1794,122 +791,259 @@
     return raw;
   }
 
-  function setAuthMsg(text, ok) {
-    if (text) {
-      authMsg.style.display = 'block';
-      authMsg.textContent = text;
-      authMsg.style.color = ok ? 'var(--correct)' : 'var(--incorrect)';
-      authMsg.style.background = ok ? 'rgba(74,222,128,0.1)' : 'rgba(239,68,68,0.1)';
-      authMsg.style.borderColor = ok ? 'rgba(74,222,128,0.3)' : 'rgba(239,68,68,0.3)';
+  function debouncedSaveState() {
+    if (saveDebounceTimer) clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = setTimeout(saveState, SAVE_DEBOUNCE_MS);
+  }
+
+  function saveState() {
+    try {
+      const data = JSON.stringify(state);
+      localStorage.setItem(STORAGE_KEY, data);
+      if (!isOfflineMode && ysdk) {
+        ysdk.saveGame({ data }).catch(function (err) {
+          console.warn('saveGame failed:', err);
+          isOfflineMode = true;
+        });
+      }
+      if (authToken) {
+        saveCloudState();
+      }
+    } catch (e) {
+      console.warn('saveState error:', e);
+    }
+  }
+
+  function loadState() {
+    return new Promise(function (resolve) {
+      function fromLocalStorage() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) return ensureStateStructure(JSON.parse(raw));
+        } catch (e) { console.warn('localStorage load failed:', e); }
+        return null;
+      }
+
+      function resolveBest() {
+        var local = fromLocalStorage();
+        resolve(local || getDefaultState());
+      }
+
+      function tryYandex() {
+        if (typeof window.YaGames !== 'undefined') {
+          window.YaGames.init().then(function (sdk) {
+            ysdk = sdk;
+            return ysdk.getPlayer({ signed: true });
+          }).then(function (player) {
+            playerData = player;
+            if (player.getMode() === 'offline') {
+              isOfflineMode = true;
+              resolveBest();
+              return;
+            }
+            return ysdk.loadGame();
+          }).then(function (saved) {
+            if (saved && saved.data) {
+              try {
+                resolve(ensureStateStructure(saved.data));
+              } catch (e) {
+                console.warn('saved data parse failed:', e);
+                resolveBest();
+              }
+            } else {
+              resolveBest();
+            }
+          }).catch(function (err) {
+            console.warn('SDK init/load failed, using localStorage:', err);
+            isOfflineMode = true;
+            resolveBest();
+          });
+        } else {
+          resolveBest();
+        }
+      }
+
+      tryYandex();
+    });
+  }
+
+  function apiCall(path, body) {
+    return fetch(API_HOST + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }).then(function (r) { return r.json(); }).catch(function () { return { error: 'Connection failed' }; });
+  }
+
+  function updateAuthUI() {
+    var nameEl = document.getElementById('userName');
+    var signIn = document.getElementById('signInBtn');
+    var signOut = document.getElementById('signOutBtn');
+    if (!nameEl) return;
+    if (authUser) {
+      nameEl.textContent = authUser.display_name || authUser.username || 'Пользователь';
+      if (signIn) signIn.classList.add('hidden');
+      if (signOut) signOut.classList.remove('hidden');
     } else {
-      authMsg.style.display = 'none';
+      nameEl.textContent = 'Гость';
+      if (signIn) signIn.classList.remove('hidden');
+      if (signOut) signOut.classList.add('hidden');
     }
   }
 
   function showAuthOverlay() {
-    authNameInput.value = '';
-    authPhraseInput.value = '';
-    authPhraseCounter.textContent = '0 / 50';
-    setAuthMsg(null);
-    authOverlay.classList.remove('hidden');
-    authNameInput.focus();
-    if (authCurrentUser && authUsers[authCurrentUser]) {
-      authUserInfo.classList.remove('hidden');
-      authCurrentUserName.textContent = '👤 ' + authCurrentUser;
+    var el = document.getElementById('authOverlay');
+    if (el) el.classList.remove('hidden');
+  }
+
+  function hideAuthOverlay() {
+    var el = document.getElementById('authOverlay');
+    if (el) el.classList.add('hidden');
+    hideAuthError();
+  }
+
+  function showAuthError(msg) {
+    var el = document.getElementById('authError');
+    if (el) { el.textContent = msg; el.classList.remove('hidden'); }
+  }
+
+  function hideAuthError() {
+    var el = document.getElementById('authError');
+    if (el) el.classList.add('hidden');
+  }
+
+  function saveAuthToStorage() {
+    if (authToken && authUser) {
+      localStorage.setItem('authToken', authToken);
+      localStorage.setItem('authUser', JSON.stringify(authUser));
     } else {
-      authUserInfo.classList.add('hidden');
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('authUser');
     }
   }
-  window.showAuthOverlay = showAuthOverlay;
 
-  function hideAuthOverlay() { authOverlay.classList.add('hidden'); }
-  window.hideAuthOverlay = hideAuthOverlay;
-
-  function handleLogin() {
-    const name = authNameInput.value.trim();
-    const phrase = authPhraseInput.value;
-    if (!name) { setAuthMsg('Введите имя пользователя'); authNameInput.focus(); return; }
-    if (!authUsers[name]) { setAuthMsg('Пользователь «' + name + '» не найден'); return; }
-    if (authUsers[name]._first) {
-      loginAsUser(name);
-      return;
+  function restoreAuthFromStorage() {
+    var token = localStorage.getItem('authToken');
+    var user = localStorage.getItem('authUser');
+    if (token && user) {
+      authToken = token;
+      try { authUser = JSON.parse(user); } catch (e) { authUser = null; }
+      updateAuthUI();
+      return true;
     }
-    if (phrase !== authUsers[name].phrase) {
-      setAuthMsg('Неверная ключевая фраза');
-      return;
-    }
-    loginAsUser(name);
-  }
-  window.handleLogin = handleLogin;
-
-  function handleRegister() {
-    const name = authNameInput.value.trim();
-    const phrase = authPhraseInput.value;
-    if (!name) { setAuthMsg('Введите имя пользователя'); authNameInput.focus(); return; }
-    if (authUsers[name]) { setAuthMsg('Пользователь «' + name + '» уже существует'); return; }
-    if (phrase.length < 10 || phrase.length > 50) {
-      setAuthMsg('Фраза должна быть от 10 до 50 символов');
-      authPhraseInput.focus();
-      return;
-    }
-    authUsers[name] = { phrase: phrase, state: getDefaultState() };
-    loginAsUser(name);
-  }
-  window.handleRegister = handleRegister;
-
-  function loginAsUser(username) {
-    authCurrentUser = username;
-    if (!authUsers[username]) return;
-    const rawState = authUsers[username].state;
-    const rawLang = rawState ? rawState.language || 'en' : 'en';
-    const oldVersion = rawState && rawState[rawLang] ? rawState[rawLang].courseDataVersion : undefined;
-    state = ensureStateStructure(rawState);
-    authUsers[username].state = state;
-    // Migration: reset course progress if courseDataVersion < 4 (stale data)
-    const perLang = state[rawLang];
-    if ((!oldVersion || oldVersion < 4) && perLang && perLang.courseBlock > 0) {
-      perLang.courseBlock = 0;
-      perLang.courseUnit = 0;
-      perLang.courseTheoryRead = false;
-      perLang.courseBlockExIdx = 0;
-      perLang.courseBlockExOrder = [];
-      perLang.courseBlockPool = [];
-      perLang.courseDataVersion = 4;
-    }
-    // Auto-set courseLevelCompleted for existing users
-    if (perLang && perLang.courseLevelCompleted === -1 && perLang.courseLevel > 0) {
-      perLang.courseLevelCompleted = perLang.courseLevel - 1;
-    }
-    delete authUsers[username]._first;
-    saveState();
-    hideAuthOverlay();
-    switchUserBtn.textContent = '👤 ' + username;
-    checkDailyReset();
-    totalCount.textContent = langData().letterOrder.length;
-    renderKeyboard();
-    renderLetters();
-    renderText();
-    updateStats();
-    updateCourseDisplay();
+    return false;
   }
 
-  function switchUser() {
-    if (authCurrentUser && authUsers[authCurrentUser]) {
-      saveState();
-    }
-    if (isActive && currentIndex > 0 && !isComplete) {
-      if (!confirm('Сменить пользователя? Текущий текст будет потерян.')) return;
-    }
-    showAuthOverlay();
+  function signInWithPhrase(username, phrase, isRegister) {
+    if (!username.trim()) { showAuthError('Введите имя'); return; }
+    if (!phrase.trim()) { showAuthError('Введите фразу'); return; }
+    hideAuthError();
+    apiCall('/api/' + (isRegister ? 'register' : 'login'), { username: username.trim(), phrase: phrase, display_name: username.trim() }).then(function (res) {
+      if (res.error) { showAuthError(res.error); return; }
+      authToken = res.token;
+      authUser = { username: username.trim(), display_name: res.display_name };
+      saveAuthToStorage();
+      updateAuthUI();
+      hideAuthOverlay();
+      if (authToken) { loadCloudState(); }
+      if (!isRegister) {
+        showModal('С возвращением, ' + username.trim() + '!', 'Ваш прогресс загружен. Продолжайте в том же духе!');
+      } else {
+        showModal('Добро пожаловать, ' + username.trim() + '! 🎉', 'Вы только что сделали первый шаг к тому, чтобы печатать со скоростью мысли. Слепая печать в XXI веке — это не просто навык, а суперсила, которая экономит часы каждый день. Удачи в тренировках!');
+      }
+    });
   }
-  window.switchUser = switchUser;
+
+  function signOutUser() {
+    authToken = null;
+    authUser = null;
+    saveAuthToStorage();
+    updateAuthUI();
+  }
+
+  function saveCloudState() {
+    if (!authToken) return;
+    var langs = Object.keys(LANG_DATA);
+    for (var i = 0; i < langs.length; i++) {
+      var lang = langs[i];
+      apiCall('/api/save', { token: authToken, language: lang, data: state[lang] });
+    }
+  }
+
+  function loadCloudState() {
+    if (!authToken) return;
+    apiCall('/api/load', { token: authToken }).then(function (res) {
+      if (res.error) return;
+      if (res.progress) {
+        var langs = Object.keys(res.progress);
+        for (var i = 0; i < langs.length; i++) {
+          var lang = langs[i];
+          if (res.progress[lang] && state[lang]) {
+            var merged = res.progress[lang];
+            if (merged.unlocked > state[lang].unlocked) state[lang].unlocked = merged.unlocked;
+            if (merged.consecutive > state[lang].consecutive) state[lang].consecutive = merged.consecutive;
+            if (merged.maxSpeed > state[lang].maxSpeed) state[lang].maxSpeed = merged.maxSpeed;
+            if (merged.bestAccuracy > state[lang].bestAccuracy) state[lang].bestAccuracy = merged.bestAccuracy;
+            if (merged.totalLessons > state[lang].totalLessons) state[lang].totalLessons = merged.totalLessons;
+            if (merged.history && merged.history.length > (state[lang].history || []).length) {
+              state[lang].history = merged.history;
+            }
+          }
+        }
+        renderLetters();
+        updateStats();
+      }
+    });
+  }
+
+  function submitLeaderboard(language, speed, accuracy, totalChars) {
+    if (!authToken) return;
+    apiCall('/api/leaderboard/submit', { token: authToken, language: language, speed: Math.round(speed), accuracy: Math.round(accuracy), total_chars: totalChars });
+  }
+
+  function showLeaderboard() {
+    var overlay = document.getElementById('leaderboardOverlay');
+    if (overlay) overlay.classList.remove('hidden');
+    renderLeaderboard('');
+  }
+
+  function closeLeaderboard() {
+    var overlay = document.getElementById('leaderboardOverlay');
+    if (overlay) overlay.classList.add('hidden');
+  }
+
+  function renderLeaderboard(lang) {
+    var content = document.getElementById('leaderboardContent');
+    if (!content) return;
+    content.innerHTML = '<div class="leaderboard-empty">Загрузка...</div>';
+    var url = API_HOST + '/api/leaderboard' + (lang ? '?lang=' + encodeURIComponent(lang) : '');
+    fetch(url).then(function (r) { return r.json(); }).then(function (entries) {
+      if (!entries || !entries.length) {
+        content.innerHTML = '<div class="leaderboard-empty">Пока нет записей</div>';
+        return;
+      }
+      var html = '<div class="lb-table"><div class="lb-row lb-header"><span class="lb-rank">#</span><span class="lb-name">Имя</span><span class="lb-lang">Язык</span><span class="lb-speed">Скорость</span><span class="lb-acc">Точность</span></div>';
+      entries.forEach(function (e, i) {
+        var cls = i < 3 ? ' lb-top lb-top-' + (i + 1) : '';
+        var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+        html += '<div class="lb-row' + cls + '"><span class="lb-rank">' + medal + '</span><span class="lb-name">' + escHtml(e.display_name || 'Unknown') + '</span><span class="lb-lang">' + escHtml(e.language || '—') + '</span><span class="lb-speed">' + Math.round(e.speed) + '</span><span class="lb-acc">' + Math.round(e.accuracy) + '%</span></div>';
+      });
+      html += '</div>';
+      content.innerHTML = html;
+    }).catch(function () {
+      content.innerHTML = '<div class="leaderboard-empty">Ошибка загрузки</div>';
+    });
+  }
+
+  function escHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
 
   function handleKeyDown(e) {
     if (e.repeat) return;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    if (!authCurrentUser) { showAuthOverlay(); return; }
-    trackActivity();
-    if (isCourseMode()) return;
     if (e.key === 'Backspace') {
       if (currentIndex > 0) {
         currentIndex--;
@@ -1946,6 +1080,9 @@
       hintText.textContent = '';
     }
 
+    cur().keyPresses++;
+    updateKeyPressDisplay();
+
     if (currentIndex >= textChars.length) return;
 
     const expected = textChars[currentIndex];
@@ -1981,7 +1118,6 @@
   }
 
   function onTextComplete() {
-    if (isCourseMode()) return;
     const { speed, accuracy, totalCorrect, totalErrors, duration } = getCurrentStats();
     const metTarget = accuracy >= state.accuracyReq && speed >= state.speedReq;
     const c = cur();
@@ -2039,7 +1175,19 @@
       msg += '<br><br>Дневная норма выполнена! Отдохните.';
     }
 
+    c.history.push({
+      ts: Date.now(),
+      speed: speed,
+      accuracy: accPct,
+      duration: Math.round(duration),
+      chars: totalCorrect + totalErrors,
+      metTarget: metTarget,
+      language: state.language
+    });
+    if (c.history.length > 500) c.history.shift();
+
     saveState();
+    submitLeaderboard(state.language, speed, accPct, totalCorrect + totalErrors);
     renderLetters();
     updateStats();
     showModal(title, msg);
@@ -2067,11 +1215,114 @@
     statUnlockedLetters.textContent = c.unlockedCount + ' / ' + langData().letterOrder.length;
     const next = getNextUnlockLetter();
     statCurrentStage.textContent = next ? 'следующая: ' + next.toUpperCase() : 'все открыты';
+
+    const totalKeyPresses = Object.values(state).reduce(function (sum, langState) {
+      return sum + (langState.keyPresses || 0);
+    }, 0);
+    const keyPressesEl = document.getElementById('statTotalKeyPresses');
+    if (keyPressesEl) keyPressesEl.textContent = totalKeyPresses.toLocaleString();
+
+    renderKeyPressesByLang();
+    renderHistory(c.history);
+    renderCharts(c.history);
     statsOverlay.classList.remove('hidden');
+  }
+
+  function renderKeyPressesByLang() {
+    const container = document.getElementById('keyPressesByLang');
+    if (!container) return;
+    const names = { ru: 'Русский', en: 'English', py: 'Python', java: 'Java', html: 'HTML', php: 'PHP', js: 'JavaScript', sql: 'SQL' };
+    const rows = Object.entries(state).filter(function (_ref) {
+      var key = _ref[0];
+      return LANG_DATA[key];
+    }).map(function (_ref2) {
+      var key = _ref2[0];
+      var langState = _ref2[1];
+      var presses = langState.keyPresses || 0;
+      return '<div class="key-press-lang-row"><span class="kl-name">' + (names[key] || key) + '</span><span class="kl-value">' + presses.toLocaleString() + '</span></div>';
+    }).join('');
+    container.innerHTML = '<div class="key-presses-title">Нажатий по раскладкам:</div>' + rows;
   }
 
   function closeStats() {
     statsOverlay.classList.add('hidden');
+  }
+
+  function renderHistory(history) {
+    if (!history || history.length === 0) {
+      historyList.innerHTML = '<div class="stat-panel-empty">Пока нет завершённых уроков</div>';
+      return;
+    }
+    const items = history.slice().reverse().map(function (h) {
+      const date = new Date(h.ts);
+      const dateStr = date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      return '<div class="history-item' + (h.metTarget ? '' : ' failed') + '">'
+        + '<span class="history-date">' + dateStr + '</span>'
+        + '<div class="history-main">'
+        + '<span class="history-speed">' + h.speed + ' симв/мин</span>'
+        + '<span class="history-accuracy">Точность: ' + h.accuracy + '% · ' + h.chars + ' симв</span>'
+        + '</div>'
+        + '<span class="history-met ' + (h.metTarget ? 'success' : 'fail') + '">'
+        + (h.metTarget ? '✓ Цель' : '✗ Провал')
+        + '</span>'
+        + '</div>';
+    }).join('');
+    historyList.innerHTML = items;
+  }
+
+  function renderCharts(history) {
+    if (!history || history.length < 2) {
+      [chartSpeed, chartAccuracy, chartProgress].forEach(function (c) {
+        if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height);
+      });
+      return;
+    }
+    drawChart(chartSpeed, history.map(function (h) { return h.speed; }), '#6c63ff', 'Скорость (симв/мин)');
+    drawChart(chartAccuracy, history.map(function (h) { return h.accuracy; }), '#4ade80', 'Точность (%)');
+    drawChart(chartProgress, history.map(function (h, i) { return i + 1; }), '#fbbf24', 'Урок №');
+  }
+
+  function drawChart(canvas, data, color, label) {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    const cssW = rect.width || canvas.clientWidth || 400;
+    const cssH = rect.height || canvas.clientHeight || 200;
+    if (cssW === 0 || cssH === 0) return;
+    const w = cssW * dpr;
+    const h = cssH * dpr;
+    canvas.width = w;
+    canvas.height = h;
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, cssW, cssH);
+    if (data.length < 2) return;
+    const max = Math.max(...data);
+    const min = Math.min(...data);
+    const range = max - min || 1;
+    const pad = 30;
+    const stepX = (cssW - pad * 2) / (data.length - 1);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    data.forEach(function (val, i) {
+      const x = pad + i * stepX;
+      const y = cssH - pad - ((val - min) / range) * (cssH - pad * 2);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    ctx.fillStyle = color;
+    data.forEach(function (val, i) {
+      const x = pad + i * stepX;
+      const y = cssH - pad - ((val - min) / range) * (cssH - pad * 2);
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.font = '11px var(--font-mono)';
+    ctx.fillStyle = '#6b6b8d';
+    ctx.fillText(label, 8, 16);
   }
 
   function resetAndGenerate() {
@@ -2082,7 +1333,7 @@
   function resetProgress() {
     if (!confirm('Сбросить весь прогресс по языку ' + langData().name + '?')) return;
     state[state.language] = getDefaultPerLang(state.language);
-    saveState();
+    debouncedSaveState();
     renderLetters();
     renderKeyboard();
     renderText();
@@ -2100,12 +1351,15 @@
       }
     }
     state.language = newLang;
-    saveState();
+    debouncedSaveState();
     renderKeyboard();
     renderLetters();
     renderText();
     updateStats();
-    updateCourseDisplay();
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme || 'dark');
   }
 
   function applyScale(pct) {
@@ -2121,10 +1375,8 @@
     textLengthInput.value = state.textLength;
     scaleInput.value = state.uiScale || 100;
     scaleLabel.textContent = scaleInput.value + '%';
-    sessionTimeoutInput.value = state.sessionTimeout || 30;
-    courseIgnoreCaseChk.checked = state.courseIgnoreCase !== false;
-    courseIgnorePunctChk.checked = state.courseIgnorePunct !== false;
     showKeyboardChk.checked = state.showKeyboard !== false;
+    themeSelect.value = state.theme || 'dark';
     settingsOverlay.classList.remove('hidden');
   }
 
@@ -2135,12 +1387,12 @@
     state.consecutiveReq = Math.max(1, parseInt(streakInput.value) || 5);
     state.textLength = Math.max(10, Math.min(500, parseInt(textLengthInput.value) || 50));
     state.uiScale = Math.max(50, Math.min(150, parseInt(scaleInput.value) || 100));
-    state.sessionTimeout = Math.max(1, parseInt(sessionTimeoutInput.value) || 30);
-    state.courseIgnoreCase = courseIgnoreCaseChk.checked;
-    state.courseIgnorePunct = courseIgnorePunctChk.checked;
     state.showKeyboard = showKeyboardChk.checked;
+    state.theme = themeSelect.value;
+    applyTheme(state.theme);
     applyScale(state.uiScale);
     saveState();
+    renderText();
     updateStats();
     closeSettings();
   }
@@ -2176,7 +1428,7 @@
         inlineEditingTarget = null;
         if (!isNaN(val) && val >= (min || 0) && val <= (max || 999)) {
           state[stateKey] = val;
-          saveState();
+          debouncedSaveState();
           input = null;
           updateStats();
           renderText();
@@ -2199,219 +1451,136 @@
   }
 
   function init() {
-    initExercises();
     var ver = document.getElementById('appVersion');
     if (ver) ver.textContent = APP_VERSION;
-    try {
-      state = loadState();
-    } catch(e) {
-      console.error('loadState failed:', e);
-      state = getDefaultState();
-    }
-    if (!state) { console.error('state is falsy, using default'); state = getDefaultState(); }
-    // Migration: reset course progress after COURSE_DATA changes
-    (function migrateCourseData(s) {
-      for (const lang of Object.keys(s)) {
-        if (lang === 'language' || lang === 'dailyGoal' || lang === 'consecutiveReq' ||
-            lang === 'speedReq' || lang === 'accuracyReq' || lang === 'courseIgnoreCase' ||
-            lang === 'courseIgnorePunct' || typeof s[lang] !== 'object' || !s[lang]) continue;
-        const pl = s[lang];
-        if (pl.courseBlockPool && pl.courseBlockPool.length) {
-          const first = pl.courseBlockPool[0];
-          if (first && typeof first.prompt === 'string' && first.prompt.indexOf('/') !== -1) {
-            pl.courseBlockPool = [];
-            pl.courseBlockExOrder = [];
-            pl.courseBlockExIdx = 0;
-            pl.courseBlock = 0;
-            pl.courseUnit = 0;
-            pl.courseTheoryRead = false;
-            pl.courseDataVersion = 4;
-          }
-        }
-        if (!pl.courseDataVersion || pl.courseDataVersion < 4) {
-          pl.courseDataVersion = 4;
-          pl.courseBlock = 0;
-          pl.courseUnit = 0;
-          pl.courseTheoryRead = false;
-          pl.courseBlockExIdx = 0;
-          pl.courseBlockExOrder = [];
-          pl.courseBlockPool = [];
-        }
-      }
-    })(state);
-    checkDailyReset();
-    totalCount.textContent = langData().letterOrder.length;
-    renderKeyboard();
-    renderLetters();
-    renderText();
-    updateStats();
-    document.addEventListener('keydown', handleKeyDown);
-    populateLangSelect(false);
-    langSelect.value = state.language;
-    langSelect.addEventListener('change', switchLanguage);
-    updateCourseDisplay();
-    newTextBtn.addEventListener('click', function () {
-      if (isCourseMode()) {
-        // В режиме курса — перейти к следующему упражнению
-        if (courseNext.style.display !== 'none') {
-          courseNext.click();
-        } else {
-          const c = cur();
-          c.courseBlockExIdx++;
-          saveState();
-          renderCourseContent();
-        }
-        return;
-      }
-      if (isActive && currentIndex > 0 && !isComplete) {
-        if (!confirm('Начать новый текст? Текущий прогресс будет потерян.')) return;
-      }
-      hideModal();
-      renderText();
-    });
-    makeInlineEditable(targetSpeed, 'speedReq', parseInt, function (v) { return v; }, 10, 500);
-    makeInlineEditable(targetAccuracy, 'accuracyReq', function (v) { return Math.min(100, Math.max(50, parseInt(v))) / 100; }, function (v) { return Math.round(v * 100); }, 50, 100);
-    makeInlineEditable(targetStreak, 'consecutiveReq', parseInt, function (v) { return v; }, 1, 50);
-    settingsBtn.addEventListener('click', openSettings);
-    resetBtn.addEventListener('click', resetProgress);
-    modalBtn.addEventListener('click', resetAndGenerate);
-    saveSettingsBtn.addEventListener('click', saveSettings);
-    closeSettingsBtn.addEventListener('click', closeSettings);
-    statsBtn.addEventListener('click', showStats);
-    closeStatsBtn.addEventListener('click', closeStats);
-    modeToggleBtn.addEventListener('click', function () {
-      if (isActive && currentIndex > 0 && !isComplete) {
-        if (!confirm('Переключить режим? Текущий текст будет потерян.')) return;
-      }
-      toggleCourseMode();
-    });
-    switchUserBtn.addEventListener('click', switchUser);
-    modalOverlay.addEventListener('click', function (e) {
-      if (e.target === modalOverlay) hideModal();
-    });
-    settingsOverlay.addEventListener('click', function (e) {
-      if (e.target === settingsOverlay) closeSettings();
-    });
-    statsOverlay.addEventListener('click', function (e) {
-      if (e.target === statsOverlay) closeStats();
-    });
-    authOverlay.addEventListener('click', function (e) {
-      if (e.target === authOverlay) hideAuthOverlay();
-    });
-    switchUserBtn.addEventListener('click', switchUser);
-    authLoginBtn.addEventListener('click', handleLogin);
-    authRegisterBtn.addEventListener('click', handleRegister);
-    authLogoutBtn.addEventListener('click', handleLogout);
-    authPhraseInput.addEventListener('input', function () {
-      const len = authPhraseInput.value.length;
-      authPhraseCounter.textContent = len + ' / 50';
-      authPhraseCounter.style.color = (len >= 10 && len <= 50 || len === 0) ? 'var(--correct)' : 'var(--incorrect)';
-    });
-    authNameInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') authPhraseInput.focus(); });
-    scaleInput.addEventListener('input', function () {
-      scaleLabel.textContent = scaleInput.value + '%';
-    });
-    (function setupKeyboardToggle() {
-      const kbSection = keyboard.closest('.keyboard-section') || keyboard.parentElement;
-      function applyKeyboardVisibility(show) {
-        state.showKeyboard = show;
-        kbSection.classList.toggle('hidden', !show);
-        keyboardToggle.checked = show;
-        showKeyboardChk.checked = show;
-      }
-      keyboardToggle.addEventListener('change', function () {
-        applyKeyboardVisibility(keyboardToggle.checked);
-      });
-      showKeyboardChk.addEventListener('change', function () {
-        applyKeyboardVisibility(showKeyboardChk.checked);
-      });
-      applyKeyboardVisibility(state.showKeyboard !== false);
-    })();
-    applyScale(state.uiScale || 100);
-    if (authCurrentUser && authUsers[authCurrentUser]) {
-      switchUserBtn.textContent = '👤 ' + authCurrentUser;
-      trackActivity();
-    }
-  }
 
-  function toggleCourseMode() {
-    console.log('toggleCourseMode: language=' + state.language + ' curActive=' + cur().courseActive + ' hasCourseData=' + !!COURSE_DATA[state.language]);
-    const c = cur();
-    c.courseActive = !c.courseActive;
-    if (!c.courseActive) {
-      console.log('toggling OFF');
-      updateCourseKeyboard();
-      saveState();
-      updateCourseDisplay();
-      renderText();
+    loadState().then(function (loadedState) {
+      state = loadedState;
+      checkDailyReset();
+      totalCount.textContent = langData().letterOrder.length;
+      renderKeyboard();
       renderLetters();
+      renderText();
       updateStats();
-      return;
-    }
-    if (!COURSE_DATA[state.language]) {
-      console.log('switching language to en');
-      state.language = 'en';
-      langSelect.value = 'en';
-      saveState();
-    }
-    const nc = cur();
-    if (!nc.courseLevel && nc.courseLevel !== 0) { nc.courseLevel = 0; nc.courseUnit = 0; }
-    console.log('nc courseLevel:', nc.courseLevel, 'nc courseActive:', nc.courseActive);
-    // Reset to first level if out of bounds (handles old saved state with different level count)
-    if (nc.courseLevel >= COURSE_DATA[state.language].levels.length) {
-      nc.courseLevel = 0;
-      nc.courseUnit = 0;
-    }
-    // Всегда начинаем с «Сборка» (block 1), пропуская перевод
-    nc.courseBlock = 1;
-    nc.courseBlockExIdx = 0;
-    nc.courseBlockExOrder = [];
-    nc.courseBlockPool = [];
-    nc.courseTheoryRead = false;
-    courseBlockPool = [];
-    nc.courseActive = true;
-    saveState();
-    updateCourseDisplay();
-    renderText();
-    renderLetters();
-    updateStats();
-  }
-  window.toggleCourseMode = toggleCourseMode;
-
-  function updateCourseDisplay() {
-    if (cur().courseActive && COURSE_DATA[state.language]) {
-      const level = COURSE_DATA[state.language].levels[cur().courseLevel];
-      modeToggleBtn.textContent = 'Тренажёр';
-      mainTitle.textContent = 'Изучение языка';
-      newTextBtn.textContent = 'Далее';
-      populateLangSelect(true);
-      if (!COURSE_DATA[langSelect.value]) {
-        langSelect.value = 'en';
-        state.language = 'en';
-        saveState();
-      }
-      if (level) {
-        const unit = getCurrentUnit();
-        const block = getCurrentBlock();
-        let info = '<strong>' + level.id + '</strong> ' + level.name;
-        if (unit) {
-          const gridCell = getGridCell(unit.cellId);
-          if (gridCell) info += ' · ' + gridCell.tense + ' · ' + gridCell.type;
-          if (block) info += ' → ' + block.label;
+      document.addEventListener('keydown', handleKeyDown);
+      populateLangSelect();
+      langSelect.value = state.language;
+      langSelect.addEventListener('change', switchLanguage);
+      newTextBtn.addEventListener('click', function () {
+        if (isActive && currentIndex > 0 && !isComplete) {
+          if (!confirm('Начать новый текст? Текущий прогресс будет потерян.')) return;
         }
-        courseLevelDisplay.style.display = '';
-        courseLevelDisplay.innerHTML = '📚 ' + info;
-      } else {
-        courseLevelDisplay.style.display = 'none';
+        hideModal();
+        renderText();
+      });
+      makeInlineEditable(targetSpeed, 'speedReq', parseInt, function (v) { return v; }, 10, 500);
+      makeInlineEditable(targetAccuracy, 'accuracyReq', function (v) { return Math.min(100, Math.max(50, parseInt(v))) / 100; }, function (v) { return Math.round(v * 100); }, 50, 100);
+      makeInlineEditable(targetStreak, 'consecutiveReq', parseInt, function (v) { return v; }, 1, 50);
+      settingsBtn.addEventListener('click', openSettings);
+      resetBtn.addEventListener('click', resetProgress);
+      modalBtn.addEventListener('click', resetAndGenerate);
+      saveSettingsBtn.addEventListener('click', saveSettings);
+      closeSettingsBtn.addEventListener('click', closeSettings);
+      statsBtn.addEventListener('click', showStats);
+      closeStatsBtn.addEventListener('click', closeStats);
+      statTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          statTabs.forEach(function (t) { t.classList.remove('active'); });
+          statPanels.forEach(function (p) { p.classList.remove('active'); });
+          tab.classList.add('active');
+          var panel = document.getElementById('panel-' + tab.dataset.tab);
+          panel.classList.add('active');
+          if (tab.dataset.tab === 'charts') {
+            requestAnimationFrame(function () {
+              renderCharts(cur().history);
+            });
+          }
+        });
+      });
+      modalOverlay.addEventListener('click', function (e) {
+        if (e.target === modalOverlay) hideModal();
+      });
+      settingsOverlay.addEventListener('click', function (e) {
+        if (e.target === settingsOverlay) closeSettings();
+      });
+      statsOverlay.addEventListener('click', function (e) {
+        if (e.target === statsOverlay) closeStats();
+      });
+      scaleInput.addEventListener('input', function () {
+        scaleLabel.textContent = scaleInput.value + '%';
+      });
+      (function setupAuth() {
+        var signInBtn = document.getElementById('signInBtn');
+        var signOutBtn = document.getElementById('signOutBtn');
+        var authUsernameInput = document.getElementById('authUsernameInput');
+        var authPhraseInput = document.getElementById('authPhraseInput');
+        var authPhraseLogin = document.getElementById('authPhraseLogin');
+        var authPhraseRegister = document.getElementById('authPhraseRegister');
+        if (signInBtn) signInBtn.addEventListener('click', showAuthOverlay);
+        if (signOutBtn) signOutBtn.addEventListener('click', signOutUser);
+        if (authPhraseLogin) authPhraseLogin.addEventListener('click', function () {
+          signInWithPhrase(authUsernameInput ? authUsernameInput.value.trim() : '', authPhraseInput ? authPhraseInput.value : '', false);
+        });
+        if (authPhraseRegister) authPhraseRegister.addEventListener('click', function () {
+          signInWithPhrase(authUsernameInput ? authUsernameInput.value.trim() : '', authPhraseInput ? authPhraseInput.value : '', true);
+        });
+        if (authPhraseInput) authPhraseInput.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            signInWithPhrase(authUsernameInput ? authUsernameInput.value.trim() : '', authPhraseInput.value, false);
+          }
+        });
+        var authOverlay = document.getElementById('authOverlay');
+        if (authOverlay) authOverlay.addEventListener('click', function (e) {
+          if (e.target === authOverlay) hideAuthOverlay();
+        });
+        updateAuthUI();
+      })();
+
+      (function setupLeaderboard() {
+        var lbBtn = document.getElementById('leaderboardBtn');
+        var closeLbBtn = document.getElementById('closeLeaderboardBtn');
+        var lbOverlay = document.getElementById('leaderboardOverlay');
+        var lbTabs = lbOverlay ? lbOverlay.querySelectorAll('.stat-tab[data-lb-lang]') : [];
+        if (lbBtn) lbBtn.addEventListener('click', showLeaderboard);
+        if (closeLbBtn) closeLbBtn.addEventListener('click', closeLeaderboard);
+        if (lbOverlay) lbOverlay.addEventListener('click', function (e) {
+          if (e.target === lbOverlay) closeLeaderboard();
+        });
+        lbTabs.forEach(function (tab) {
+          tab.addEventListener('click', function () {
+            lbTabs.forEach(function (t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            renderLeaderboard(tab.dataset.lbLang);
+          });
+        });
+      })();
+
+      (function setupKeyboardToggle() {
+        const kbSection = keyboard.closest('.keyboard-section') || keyboard.parentElement;
+        function applyKeyboardVisibility(show) {
+          state.showKeyboard = show;
+          kbSection.classList.toggle('hidden', !show);
+          keyboardToggle.checked = show;
+          showKeyboardChk.checked = show;
+        }
+        keyboardToggle.addEventListener('change', function () {
+          applyKeyboardVisibility(keyboardToggle.checked);
+        });
+        showKeyboardChk.addEventListener('change', function () {
+          applyKeyboardVisibility(showKeyboardChk.checked);
+        });
+        applyKeyboardVisibility(state.showKeyboard !== false);
+      })();
+      if (restoreAuthFromStorage()) {
+        loadCloudState();
       }
-    } else {
-      modeToggleBtn.textContent = 'Курс';
-      mainTitle.textContent = 'Клавиатурный тренажёр';
-      newTextBtn.textContent = 'Новый текст';
-      populateLangSelect(false);
-      courseLevelDisplay.style.display = 'none';
-    }
+      applyTheme(state.theme);
+      applyScale(state.uiScale || 100);
+    });
   }
+
+
 
   document.addEventListener('DOMContentLoaded', init);
 })();
