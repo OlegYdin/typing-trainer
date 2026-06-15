@@ -9,31 +9,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '2mb' }));
 
-const DB_PATH = path.join(os.tmpdir(), 'typing-trainer.db');
-
-let db;
-
-function dbGet(sql, params) {
-  const stmt = db.prepare(sql);
-  if (params) stmt.bind(params);
-  if (stmt.step()) { const r = stmt.getAsObject(); stmt.free(); return r; }
-  stmt.free(); return null;
-}
-
-function dbAll(sql, params) {
-  const stmt = db.prepare(sql);
-  if (params) stmt.bind(params);
-  const rows = [];
-  while (stmt.step()) rows.push(stmt.getAsObject());
-  stmt.free();
-  return rows;
-}
-
-function dbRun(sql, params) {
-  if (params) db.run(sql, params); else db.run(sql);
-  const r = dbGet('SELECT last_insert_rowid() as id');
-  return { lastInsertRowid: r ? r.id : null };
-}
+const DB_PATH = path.join(os.tmpdir(), 'typing.db');
 
 function hashPhrase(phrase) {
   return crypto.createHash('sha256').update(phrase).digest('hex');
@@ -44,29 +20,60 @@ function generateToken() {
 }
 
 async function init() {
-  let SQL;
-  try {
-    const m = require('node:sqlite');
-    const sdb = new m.DatabaseSync(DB_PATH);
-    db = {
-      prepare(sql) { return sdb.prepare(sql); },
-      run(sql, params) { if (params) sdb.run(sql, params); else sdb.exec(sql); },
-      exec: (sql) => sdb.exec(sql)
-    };
-    dbGet = (sql, params) => { const stmt = sdb.prepare(sql); const r = stmt.get(...(params || [])); return r || null; };
-    dbAll = (sql, params) => { const stmt = sdb.prepare(sql); return stmt.all(...(params || [])); };
-    dbRun = (sql, params) => { const stmt = sdb.prepare(sql); const r = stmt.run(...(params || [])); return { lastInsertRowid: r.lastInsertRowid }; };
-    console.log('Using node:sqlite at', DB_PATH);
-  } catch (e) {
-    console.log('Falling back to sql.js');
-    const initSqlJs = require('sql.js');
-    SQL = await initSqlJs();
-    let buf;
-    try { buf = fs.readFileSync(DB_PATH); } catch (e) {}
-    db = new SQL.Database(buf);
-  }
+  let db;
 
-  db.exec('PRAGMA journal_mode = WAL');
+  try {
+    const { DatabaseSync } = require('node:sqlite');
+    const raw = new DatabaseSync(DB_PATH);
+    db = {
+      exec(sql) { raw.exec(sql); },
+      prepare(sql) {
+        const stmt = raw.prepare(sql);
+        return {
+          get(...p) { return stmt.get(...p) || null; },
+          all(...p) { return stmt.all(...p); },
+          run(...p) { return stmt.run(...p); }
+        };
+      }
+    };
+  } catch (e1) {
+    try {
+      const initSqlJs = require('sql.js');
+      const SQL = await initSqlJs();
+      let buf;
+      try { buf = fs.readFileSync(DB_PATH); } catch (e) {}
+      const raw = new SQL.Database(buf);
+      const save = () => { const d = raw.export(); fs.writeFileSync(DB_PATH, Buffer.from(d)); };
+      db = {
+        exec(sql) { raw.run(sql); save(); },
+        prepare(sql) {
+          return {
+            get(...params) {
+              const stmt = raw.prepare(sql);
+              if (params.length) stmt.bind(params);
+              if (stmt.step()) { const r = stmt.getAsObject(); stmt.free(); return r; }
+              stmt.free(); return null;
+            },
+            all(...params) {
+              const stmt = raw.prepare(sql);
+              if (params.length) stmt.bind(params);
+              const rows = []; while (stmt.step()) rows.push(stmt.getAsObject());
+              stmt.free(); return rows;
+            },
+            run(...params) {
+              if (params.length) raw.run(sql, params); else raw.run(sql);
+              save();
+              const r = raw.exec('SELECT last_insert_rowid()')[0];
+              return { lastInsertRowid: r ? r.values[0][0] : null };
+            }
+          };
+        }
+      };
+    } catch (e2) {
+      console.error('Both node:sqlite and sql.js failed:', e1, e2);
+      process.exit(1);
+    }
+  }
 
   db.exec(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -104,32 +111,25 @@ async function init() {
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
-  if (SQL) {
-    const data = db.export();
-    fs.writeFileSync(DB_PATH, Buffer.from(data));
-  }
-
   function getUserFromToken(token) {
     if (!token) return null;
-    return dbGet(
+    return db.prepare(
       `SELECT sessions.user_id, users.username, users.display_name
        FROM sessions JOIN users ON sessions.user_id = users.id
-       WHERE sessions.token = ?`,
-      [token]
-    );
+       WHERE sessions.token = ?`
+    ).get(token);
   }
 
   app.post('/api/register', (req, res) => {
     const { username, phrase, display_name } = req.body;
     if (!username || !phrase) return res.json({ error: 'Username and phrase required' });
-    if (dbGet('SELECT id FROM users WHERE username = ?', [username]))
+    if (db.prepare('SELECT id FROM users WHERE username = ?').get(username))
       return res.json({ error: 'Username already taken' });
     const phraseHash = hashPhrase(phrase);
     const name = display_name || username;
-    const result = dbRun('INSERT INTO users (username, phrase_hash, display_name) VALUES (?, ?, ?)', [username, phraseHash, name]);
+    const result = db.prepare('INSERT INTO users (username, phrase_hash, display_name) VALUES (?, ?, ?)').run(username, phraseHash, name);
     const token = generateToken();
-    dbRun('INSERT INTO sessions (token, user_id) VALUES (?, ?)', [token, result.lastInsertRowid]);
-    if (SQL) { const d = db.export(); fs.writeFileSync(DB_PATH, Buffer.from(d)); }
+    db.prepare('INSERT INTO sessions (token, user_id) VALUES (?, ?)').run(token, result.lastInsertRowid);
     res.json({ token, user_id: result.lastInsertRowid, display_name: name });
   });
 
@@ -137,11 +137,10 @@ async function init() {
     const { username, phrase } = req.body;
     if (!username || !phrase) return res.json({ error: 'Username and phrase required' });
     const phraseHash = hashPhrase(phrase);
-    const user = dbGet('SELECT id, display_name FROM users WHERE username = ? AND phrase_hash = ?', [username, phraseHash]);
+    const user = db.prepare('SELECT id, display_name FROM users WHERE username = ? AND phrase_hash = ?').get(username, phraseHash);
     if (!user) return res.json({ error: 'Invalid username or phrase' });
     const token = generateToken();
-    dbRun('INSERT INTO sessions (token, user_id) VALUES (?, ?)', [token, user.id]);
-    if (SQL) { const d = db.export(); fs.writeFileSync(DB_PATH, Buffer.from(d)); }
+    db.prepare('INSERT INTO sessions (token, user_id) VALUES (?, ?)').run(token, user.id);
     res.json({ token, user_id: user.id, display_name: user.display_name });
   });
 
@@ -150,20 +149,18 @@ async function init() {
     if (!user) return res.json({ error: 'Not authenticated' });
     const { language, data } = req.body;
     if (!language || !data) return res.json({ error: 'Language and data required' });
-    dbRun(
+    db.prepare(
       `INSERT INTO progress (user_id, language, data, updated_at)
        VALUES (?, ?, ?, datetime('now'))
-       ON CONFLICT(user_id, language) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`,
-      [user.user_id, language, JSON.stringify(data)]
-    );
-    if (SQL) { const d = db.export(); fs.writeFileSync(DB_PATH, Buffer.from(d)); }
+       ON CONFLICT(user_id, language) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`
+    ).run(user.user_id, language, JSON.stringify(data));
     res.json({ ok: true });
   });
 
   app.post('/api/load', (req, res) => {
     const user = getUserFromToken(req.body.token);
     if (!user) return res.json({ error: 'Not authenticated' });
-    const rows = dbAll('SELECT language, data FROM progress WHERE user_id = ?', [user.user_id]);
+    const rows = db.prepare('SELECT language, data FROM progress WHERE user_id = ?').all(user.user_id);
     const progress = {};
     for (const row of rows) {
       try { progress[row.language] = JSON.parse(row.data); } catch (e) { progress[row.language] = null; }
@@ -176,9 +173,8 @@ async function init() {
     if (!user) return res.json({ error: 'Not authenticated' });
     const { language, speed, accuracy, total_chars } = req.body;
     if (!language || speed == null) return res.json({ error: 'Missing fields' });
-    dbRun('INSERT INTO leaderboard (user_id, display_name, language, speed, accuracy, total_chars) VALUES (?, ?, ?, ?, ?, ?)',
-      [user.user_id, user.display_name, language, speed, accuracy || 0, total_chars || 0]);
-    if (SQL) { const d = db.export(); fs.writeFileSync(DB_PATH, Buffer.from(d)); }
+    db.prepare('INSERT INTO leaderboard (user_id, display_name, language, speed, accuracy, total_chars) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(user.user_id, user.display_name, language, speed, accuracy || 0, total_chars || 0);
     res.json({ ok: true });
   });
 
@@ -188,20 +184,21 @@ async function init() {
     const params = [];
     if (lang) { sql += ' WHERE language = ?'; params.push(lang); }
     sql += ' ORDER BY speed DESC, accuracy DESC LIMIT 100';
-    res.json(dbAll(sql, params.length ? params : undefined));
+    res.json(db.prepare(sql).all(...params.length ? params : undefined));
   });
 
   app.use(express.static(__dirname));
+
   app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'index.html'));
   });
 
   app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}, db at ${DB_PATH}`);
   });
 }
 
 init().catch(err => {
-  console.error('Failed to start server:', err);
+  console.error('Failed:', err);
   process.exit(1);
 });
