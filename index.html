@@ -127,6 +127,7 @@
             <button class="btn btn-secondary" id="leaderboardBtn">🏆 Таблица</button>
             <button class="btn btn-secondary" id="settingsBtn">⚙ Настройки</button>
             <button class="btn btn-secondary" id="donateBtn">❤ Поддержать</button>
+            <button class="btn btn-secondary" id="suggestionsBtn">💡 Идеи</button>
           </div>
         </div>
 
@@ -304,6 +305,39 @@
           <div class="leaderboard-empty">Загрузка...</div>
         </div>
         <button class="btn btn-primary" id="closeLeaderboardBtn">Закрыть</button>
+      </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="suggestionsOverlay">
+      <div class="modal modal-suggestions">
+        <div class="stats-header">
+          <h2>💡 Предложения по улучшению</h2>
+          <button class="btn btn-primary btn-sm" id="addSuggestionBtn">+ Добавить идею</button>
+        </div>
+        <div class="suggestions-content" id="suggestionsContent">
+          <div class="leaderboard-empty">Загрузка...</div>
+        </div>
+        <button class="btn btn-primary" id="closeSuggestionsBtn">Закрыть</button>
+      </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="suggestionFormOverlay">
+      <div class="modal modal-settings">
+        <h2>Новая идея</h2>
+        <div class="settings-form">
+          <label class="setting-row">
+            <span>Заголовок</span>
+            <input type="text" id="suggestionTitleInput" placeholder="Кратко опишите идею" style="width:100%;flex:1">
+          </label>
+          <label class="setting-row" style="flex-direction:column;align-items:stretch">
+            <span>Описание</span>
+            <textarea id="suggestionDescInput" class="auth-input auth-phrase" rows="4" placeholder="Подробное описание предложения..." style="width:100%"></textarea>
+          </label>
+        </div>
+        <div class="settings-actions">
+          <button class="btn btn-primary" id="submitSuggestionBtn">Отправить</button>
+          <button class="btn btn-secondary" id="cancelSuggestionBtn">Отмена</button>
+        </div>
       </div>
     </div>
 

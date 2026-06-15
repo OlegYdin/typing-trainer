@@ -1312,6 +1312,159 @@ header h1 {
   color: #fff;
 }
 
+.modal-suggestions {
+  max-width: 640px;
+  text-align: left;
+}
+.modal-suggestions h2 {
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  color: var(--text);
+  font-size: 1.3rem;
+  margin: 0;
+}
+.suggestions-content {
+  max-height: 450px;
+  overflow-y: auto;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.suggestion-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+.suggestion-card:hover {
+  border-color: var(--accent);
+}
+.suggestion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.suggestion-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+  word-break: break-word;
+}
+.suggestion-author {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.suggestion-desc {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+.suggestion-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.suggestion-vote-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.suggestion-vote-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.suggestion-vote-btn.voted {
+  background: rgba(108,99,255,0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.suggestion-comment-toggle {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+.suggestion-comment-toggle:hover {
+  color: var(--text);
+}
+.suggestion-comments {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.suggestion-comments.hidden {
+  display: none;
+}
+.comment-item {
+  font-size: 0.8rem;
+  padding: 8px 10px;
+  background: var(--surface);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.comment-author {
+  font-weight: 600;
+  color: var(--accent);
+  margin-right: 6px;
+}
+.comment-text {
+  color: var(--text);
+}
+.comment-date {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+.comment-form {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+.comment-form input {
+  flex: 1;
+  padding: 6px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.8rem;
+  font-family: inherit;
+  outline: none;
+}
+.comment-form input:focus {
+  border-color: var(--accent);
+}
+.comment-form .btn {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+}
+
 .app-version {
   position: fixed;
   bottom: 6px;

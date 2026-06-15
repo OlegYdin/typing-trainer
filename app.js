@@ -1041,6 +1041,116 @@
     return d.innerHTML;
   }
 
+  function showSuggestions() {
+    document.getElementById('suggestionsOverlay').classList.remove('hidden');
+    renderSuggestions();
+  }
+
+  function closeSuggestions() {
+    document.getElementById('suggestionsOverlay').classList.add('hidden');
+  }
+
+  function renderSuggestions() {
+    var content = document.getElementById('suggestionsContent');
+    if (!content) return;
+    content.innerHTML = '<div class="leaderboard-empty">Загрузка...</div>';
+    var url = API_HOST + '/api/suggestions';
+    if (authUser) url += '?user_id=' + authUser.user_id;
+    fetch(url).then(function (r) { return r.json(); }).then(function (items) {
+      if (!items || !items.length) {
+        content.innerHTML = '<div class="leaderboard-empty">Пока нет предложений. Будьте первым!</div>';
+        return;
+      }
+      var html = '';
+      items.forEach(function (s) {
+        var votedClass = s.user_voted ? ' voted' : '';
+        html += '<div class="suggestion-card" data-id="' + s.id + '">'
+          + '<div class="suggestion-header">'
+          + '<div class="suggestion-title">' + escHtml(s.title) + '</div>'
+          + '<div class="suggestion-author">' + escHtml(s.display_name) + ' · ' + new Date(s.created_at).toLocaleDateString('ru-RU') + '</div>'
+          + '</div>'
+          + (s.description ? '<div class="suggestion-desc">' + escHtml(s.description) + '</div>' : '')
+          + '<div class="suggestion-actions">'
+          + '<button class="suggestion-vote-btn' + votedClass + '" onclick="window.__voteSuggestion(' + s.id + ')">👍 <span class="vote-count">' + s.votes + '</span></button>'
+          + '<button class="suggestion-comment-toggle" onclick="window.__toggleComments(' + s.id + ')">💬 ' + s.comments + ' комментариев</button>'
+          + '</div>'
+          + '<div class="suggestion-comments hidden" id="comments-' + s.id + '"></div>'
+          + '</div>';
+      });
+      content.innerHTML = html;
+    }).catch(function () {
+      content.innerHTML = '<div class="leaderboard-empty">Ошибка загрузки</div>';
+    });
+  }
+
+  window.__voteSuggestion = function (id) {
+    if (!authToken) { showAuthOverlay(); return; }
+    apiCall('/api/suggestions/' + id + '/vote', { token: authToken }).then(function (res) {
+      if (res.error) return;
+      renderSuggestions();
+    });
+  };
+
+  window.__toggleComments = function (id) {
+    var el = document.getElementById('comments-' + id);
+    if (!el) return;
+    var isHidden = el.classList.contains('hidden');
+    if (isHidden) {
+      el.classList.remove('hidden');
+      el.innerHTML = '<div class="leaderboard-empty" style="padding:8px 0">Загрузка...</div>';
+      fetch(API_HOST + '/api/suggestions/' + id + '/comments').then(function (r) { return r.json(); }).then(function (comments) {
+        var html = '';
+        comments.forEach(function (c) {
+          html += '<div class="comment-item"><span class="comment-author">' + escHtml(c.display_name) + '</span><span class="comment-text">' + escHtml(c.text) + '</span><span class="comment-date">' + new Date(c.created_at).toLocaleString('ru-RU') + '</span></div>';
+        });
+        html += '<div class="comment-form">'
+          + '<input type="text" id="comment-input-' + id + '" placeholder="Написать комментарий..." onkeydown="if(event.key==\'Enter\'&&!event.shiftKey){event.preventDefault();window.__submitComment(' + id + ')}">'
+          + '<button class="btn btn-primary" onclick="window.__submitComment(' + id + ')">Отправить</button>'
+          + '</div>';
+        el.innerHTML = html;
+        var inp = document.getElementById('comment-input-' + id);
+        if (inp) inp.focus();
+      });
+    } else {
+      el.classList.add('hidden');
+    }
+  };
+
+  window.__submitComment = function (id) {
+    if (!authToken) { showAuthOverlay(); return; }
+    var inp = document.getElementById('comment-input-' + id);
+    if (!inp || !inp.value.trim()) return;
+    apiCall('/api/suggestions/' + id + '/comments', { token: authToken, text: inp.value.trim() }).then(function (res) {
+      if (res.error) return;
+      inp.value = '';
+      window.__toggleComments(id);
+      renderSuggestions();
+    });
+  };
+
+  function openSuggestionForm() {
+    if (!authToken) { showAuthOverlay(); return; }
+    document.getElementById('suggestionTitleInput').value = '';
+    document.getElementById('suggestionDescInput').value = '';
+    document.getElementById('suggestionFormOverlay').classList.remove('hidden');
+  }
+
+  function closeSuggestionForm() {
+    document.getElementById('suggestionFormOverlay').classList.add('hidden');
+  }
+
+  function submitSuggestion() {
+    if (!authToken) return;
+    var title = document.getElementById('suggestionTitleInput').value.trim();
+    var desc = document.getElementById('suggestionDescInput').value.trim();
+    if (!title) { alert('Введите заголовок'); return; }
+    apiCall('/api/suggestions', { token: authToken, title: title, description: desc }).then(function (res) {
+      if (res.error) { alert(res.error); return; }
+      closeSuggestionForm();
+      renderSuggestions();
+    });
+  }
+
   function handleKeyDown(e) {
     if (e.repeat) return;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -1554,6 +1664,27 @@
             renderLeaderboard(tab.dataset.lbLang);
           });
         });
+      })();
+
+      (function setupSuggestions() {
+        var btn = document.getElementById('suggestionsBtn');
+        var closeBtn = document.getElementById('closeSuggestionsBtn');
+        var overlay = document.getElementById('suggestionsOverlay');
+        var addBtn = document.getElementById('addSuggestionBtn');
+        var submitBtn = document.getElementById('submitSuggestionBtn');
+        var cancelBtn = document.getElementById('cancelSuggestionBtn');
+        var formOverlay = document.getElementById('suggestionFormOverlay');
+        if (btn) btn.addEventListener('click', showSuggestions);
+        if (closeBtn) closeBtn.addEventListener('click', closeSuggestions);
+        if (overlay) overlay.addEventListener('click', function (e) {
+          if (e.target === overlay) closeSuggestions();
+        });
+        if (addBtn) addBtn.addEventListener('click', openSuggestionForm);
+        if (cancelBtn) cancelBtn.addEventListener('click', closeSuggestionForm);
+        if (formOverlay) formOverlay.addEventListener('click', function (e) {
+          if (e.target === formOverlay) closeSuggestionForm();
+        });
+        if (submitBtn) submitBtn.addEventListener('click', submitSuggestion);
       })();
 
       (function setupKeyboardToggle() {

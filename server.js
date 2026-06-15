@@ -12,7 +12,7 @@ app.get('/health', (req, res) => res.json({ ok: true }));
 
 const DATA_PATH = path.join(os.tmpdir(), 'typing-data.json');
 
-let data = { users: [], sessions: [], progress: [], leaderboard: [] };
+let data = { users: [], sessions: [], progress: [], leaderboard: [], suggestions: [], comments: [] };
 
 function load() {
   try { data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8')); } catch (e) {}
@@ -92,6 +92,60 @@ app.get('/api/leaderboard', (req, res) => {
   if (lang) rows = rows.filter(r => r.language === lang);
   rows.sort((a, b) => b.speed - a.speed || b.accuracy - a.accuracy);
   res.json(rows.slice(0, 100));
+});
+
+app.get('/api/suggestions', (req, res) => {
+  const result = (data.suggestions || []).map(s => ({
+    ...s, votes: s.votes?.length || 0, user_voted: req.query.user_id ? (s.votes || []).includes(Number(req.query.user_id)) : false
+  }));
+  result.sort((a, b) => b.votes - a.votes || new Date(b.created_at) - new Date(a.created_at));
+  res.json(result);
+});
+
+app.post('/api/suggestions', (req, res) => {
+  const user = getUserFromToken(req.body.token);
+  if (!user) return res.json({ error: 'Not authenticated' });
+  const { title, description } = req.body;
+  if (!title) return res.json({ error: 'Title required' });
+  if (!data.suggestions) data.suggestions = [];
+  data.suggestions.push({
+    id: data.suggestions.length + 1, user_id: user.user_id, display_name: user.display_name,
+    title, description: description || '', votes: [], comments: 0, created_at: new Date().toISOString()
+  });
+  save();
+  res.json({ ok: true });
+});
+
+app.post('/api/suggestions/:id/vote', (req, res) => {
+  const user = getUserFromToken(req.body.token);
+  if (!user) return res.json({ error: 'Not authenticated' });
+  const s = (data.suggestions || []).find(s => s.id === Number(req.params.id));
+  if (!s) return res.json({ error: 'Not found' });
+  const idx = (s.votes || []).indexOf(user.user_id);
+  if (idx >= 0) s.votes.splice(idx, 1); else (s.votes || (s.votes = [])).push(user.user_id);
+  save();
+  res.json({ ok: true, voted: idx < 0, votes: s.votes.length });
+});
+
+app.get('/api/suggestions/:id/comments', (req, res) => {
+  const comments = (data.comments || []).filter(c => c.suggestion_id === Number(req.params.id));
+  res.json(comments);
+});
+
+app.post('/api/suggestions/:id/comments', (req, res) => {
+  const user = getUserFromToken(req.body.token);
+  if (!user) return res.json({ error: 'Not authenticated' });
+  const { text } = req.body;
+  if (!text) return res.json({ error: 'Text required' });
+  if (!data.comments) data.comments = [];
+  data.comments.push({
+    id: data.comments.length + 1, suggestion_id: Number(req.params.id),
+    user_id: user.user_id, display_name: user.display_name, text, created_at: new Date().toISOString()
+  });
+  const s = (data.suggestions || []).find(s => s.id === Number(req.params.id));
+  if (s) s.comments = (data.comments || []).filter(c => c.suggestion_id === s.id).length;
+  save();
+  res.json({ ok: true });
 });
 
 app.use(express.static(__dirname));
