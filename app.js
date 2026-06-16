@@ -1016,17 +1016,23 @@
     var content = document.getElementById('leaderboardContent');
     if (!content) return;
     content.innerHTML = '<div class="leaderboard-empty">Загрузка...</div>';
-    var url = API_HOST + '/api/leaderboard' + (lang ? '?lang=' + encodeURIComponent(lang) : '');
+    var activeDiff = document.querySelector('[data-lb-diff].active');
+    var diff = activeDiff ? activeDiff.dataset.lbDiff : '';
+    var params = [];
+    if (lang) params.push('lang=' + encodeURIComponent(lang));
+    if (diff) params.push('difficulty=' + encodeURIComponent(diff));
+    var url = API_HOST + '/api/leaderboard' + (params.length ? '?' + params.join('&') : '');
     fetch(url).then(function (r) { return r.json(); }).then(function (entries) {
       if (!entries || !entries.length) {
         content.innerHTML = '<div class="leaderboard-empty">Пока нет записей</div>';
         return;
       }
-      var html = '<div class="lb-table"><div class="lb-row lb-header"><span class="lb-rank">#</span><span class="lb-name">Имя</span><span class="lb-lang">Язык</span><span class="lb-speed">Скорость</span><span class="lb-acc">Точность</span></div>';
+      var html = '<div class="lb-table"><div class="lb-row lb-header"><span class="lb-rank">#</span><span class="lb-name">Имя</span><span class="lb-lang">Язык</span><span class="lb-speed">Скорость</span><span class="lb-acc">Точность</span><span class="lb-diff">Ур.</span></div>';
       entries.forEach(function (e, i) {
         var cls = i < 3 ? ' lb-top lb-top-' + (i + 1) : '';
         var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
-        html += '<div class="lb-row' + cls + '"><span class="lb-rank">' + medal + '</span><span class="lb-name">' + escHtml(e.display_name || 'Unknown') + '</span><span class="lb-lang">' + escHtml(e.language || '—') + '</span><span class="lb-speed">' + Math.round(e.speed) + '</span><span class="lb-acc">' + Math.round(e.accuracy) + '%</span></div>';
+        var lvl = e.difficulty || 0;
+        html += '<div class="lb-row' + cls + '"><span class="lb-rank">' + medal + '</span><span class="lb-name">' + escHtml(e.display_name || 'Unknown') + '</span><span class="lb-lang">' + escHtml(e.language || '—') + '</span><span class="lb-speed">' + Math.round(e.speed) + '</span><span class="lb-acc">' + Math.round(e.accuracy) + '%</span><span class="lb-diff">' + lvl + '</span></div>';
       });
       html += '</div>';
       content.innerHTML = html;
@@ -1796,7 +1802,159 @@
     });
   }
 
+  // ---- Speed test ----
+  var ST_TEXTS = {
+    ru: [
+      'Мой дядя самых честных правил когда не в шутку занемог он уважать себя заставил и лучше выдумать не мог',
+      'Все счастливые семьи похожи друг на друга каждая несчастливая семья несчастлива по своему',
+      'В человеке должно быть все прекрасно и лицо и одежда и душа и мысли',
+      'Скажи ка дядя ведь недаром Москва спаленная пожаром французу отдана',
+      'Быть или не быть вот в чем вопрос что благородней духом покоряться пращам и стрелам яростной судьбы',
+      'Гроза в двенадцатом году пришла кто тут помог нам озлобление народа Барклай зима иль русский бог',
+      'Татьяна верила преданьям простонародной старины и снам и карточным гаданьям и предсказаниям луны',
+      'В басне как в жизни нет ничего лишнего все к чему то ведет',
+      'Кто с пользою отечеству трудится тот легко с ним не разлучится',
+      'Умом Россию не понять аршином общим не измерить у ней особенная стать в Россию можно только верить',
+      'Человек создан для счастья как птица для полета',
+      'На дне души у каждого человека есть своя маленькая бездонная пропасть',
+      'Любите книгу источник знания только знание спасательно только оно может сделать вас духовно сильными',
+      'Самое дорогое у человека это жизнь она дается ему один раз и прожить ее надо так чтобы не было мучительно больно',
+    ],
+    en: [
+      'It was the best of times it was the worst of times it was the age of wisdom it was the age of foolishness',
+      'To be or not to be that is the question whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune',
+      'All happy families are alike each unhappy family is unhappy in its own way',
+      'Call me Ishmael some years ago never mind how long precisely having little or no money in my purse',
+      'It is a truth universally acknowledged that a single man in possession of a good fortune must be in want of a wife',
+      'The only way to have a friend is to be one',
+      'In the middle of difficulty lies opportunity',
+      'Two roads diverged in a wood and I took the one less traveled by and that has made all the difference',
+      'It was a bright cold day in April and the clocks were striking thirteen',
+      'Happy families are all alike every unhappy family is unhappy in its own way',
+      'The old man and the sea is a story of a man who refuses to give up despite all the hardships',
+      'All animals are equal but some animals are more equal than others',
+      'It is a far far better thing that I do than I have ever done it is a far far better rest that I go to than I have ever known',
+      'The sky above the port was the color of television tuned to a dead channel',
+    ],
+  };
 
+  var stState = { active: false, text: '', typed: '', startTime: null, timerInterval: null, errors: 0, totalTyped: 0 };
+
+  function stTransform(text, difficulty) {
+    text = text.trim();
+    if (difficulty === 1) { text = text.toLowerCase().replace(/[^a-zа-яё\s]/g, ''); }
+    else if (difficulty === 2) { text = text.replace(/[^a-zA-Zа-яА-ЯёЁ\s]/g, ''); }
+    return text.replace(/\s+/g, ' ');
+  }
+
+  function stStartTest() {
+    var diff = parseInt(document.getElementById('stDifficulty').value);
+    var lang = document.getElementById('stLang').value;
+    var source = document.getElementById('stSource').value;
+    var customText = document.getElementById('stCustomText').value.trim();
+    var raw;
+    if (source === 'custom' && customText) { raw = customText; }
+    else { var texts = ST_TEXTS[lang] || ST_TEXTS.ru; raw = texts[Math.floor(Math.random() * texts.length)]; }
+    var text = stTransform(raw, diff);
+    if (text.length < 10) { alert('Слишком короткий текст'); return; }
+    stState.text = text; stState.typed = ''; stState.errors = 0; stState.totalTyped = 0; stState.active = true; stState.startTime = Date.now();
+    document.getElementById('speedTestSetup').classList.add('hidden');
+    document.getElementById('speedTestActive').classList.remove('hidden');
+    document.getElementById('speedTestResult').classList.add('hidden');
+    var el = document.getElementById('stTextDisplay');
+    var html = '';
+    for (var i = 0; i < text.length; i++) { var ch = text[i]; html += '<span class="st-char" data-idx="' + i + '">' + (ch === ' ' ? '&nbsp;' : escHtml(ch)) + '</span>'; }
+    el.innerHTML = html;
+    document.getElementById('stInput').value = '';
+    document.getElementById('stInput').focus();
+    if (stState.timerInterval) clearInterval(stState.timerInterval);
+    stState.timerInterval = setInterval(function () {
+      if (!stState.active) return;
+      var elapsed = (Date.now() - stState.startTime) / 1000;
+      var speed = stState.totalTyped > 0 ? Math.round((stState.totalTyped - stState.errors) / elapsed * 60) : 0;
+      var accuracy = stState.totalTyped > 0 ? Math.round((1 - stState.errors / stState.totalTyped) * 100) : 100;
+      document.getElementById('stTime').textContent = Math.floor(elapsed);
+      document.getElementById('stSpeed').textContent = speed;
+      document.getElementById('stAccuracy').textContent = Math.min(accuracy, 100);
+      document.getElementById('stProgress').textContent = Math.min(Math.round(stState.totalTyped / text.length * 100), 100);
+    }, 200);
+  }
+
+  function stFinishTest() {
+    if (!stState.active) return;
+    stState.active = false;
+    if (stState.timerInterval) { clearInterval(stState.timerInterval); stState.timerInterval = null; }
+    var elapsed = (Date.now() - stState.startTime) / 1000;
+    var total = stState.totalTyped || stState.text.length;
+    var speed = Math.round((total - stState.errors) / elapsed * 60);
+    var accuracy = Math.round((1 - stState.errors / total) * 100);
+    document.getElementById('speedTestActive').classList.add('hidden');
+    document.getElementById('speedTestResult').classList.remove('hidden');
+    document.getElementById('stResultSpeed').textContent = speed;
+    document.getElementById('stResultAccuracy').textContent = Math.min(accuracy, 100);
+    document.getElementById('stResultChars').textContent = total;
+    document.getElementById('stResultTime').textContent = Math.floor(elapsed);
+    stState._lastResult = { speed: speed, accuracy: Math.min(accuracy, 100), total_chars: total, difficulty: parseInt(document.getElementById('stDifficulty').value), language: document.getElementById('stLang').value };
+  }
+
+  // Error counting in speed test input
+  var _stInputHandler = function (e) {
+    if (e.target.id !== 'stInput' || !stState.active) return;
+    var val = e.target.value;
+    var text = stState.text;
+    stState.typed = val; stState.totalTyped = val.length; stState.errors = 0;
+    var chars = document.querySelectorAll('#stTextDisplay .st-char');
+    for (var i = 0; i < chars.length; i++) {
+      chars[i].className = 'st-char';
+      if (i < val.length) { if (val[i] === text[i]) { chars[i].classList.add('st-correct'); } else { chars[i].classList.add('st-incorrect'); if (i === val.length - 1) stState.errors++; } }
+    }
+    if (val.length > 0 && val.length <= chars.length) { chars[Math.min(val.length, chars.length - 1)].classList.add('st-current'); }
+    if (val.length >= text.length) stFinishTest();
+  };
+  document.addEventListener('input', _stInputHandler);
+
+  // Speed test UI events
+  document.addEventListener('change', function (e) {
+    if (e.target.id === 'stSource') { document.getElementById('stCustomText').classList.toggle('hidden', e.target.value !== 'custom'); }
+  });
+  document.addEventListener('click', function (e) {
+    if (e.target.id === 'speedTestBtn') {
+      document.getElementById('speedTestPanel').classList.toggle('hidden');
+      document.getElementById('speedTestSetup').classList.remove('hidden');
+      document.getElementById('speedTestActive').classList.add('hidden');
+      document.getElementById('speedTestResult').classList.add('hidden');
+      if (stState.timerInterval) { clearInterval(stState.timerInterval); stState.timerInterval = null; }
+      stState.active = false;
+    }
+    if (e.target.id === 'speedTestCloseBtn') {
+      document.getElementById('speedTestPanel').classList.add('hidden');
+      if (stState.timerInterval) { clearInterval(stState.timerInterval); stState.timerInterval = null; }
+      stState.active = false;
+    }
+    if (e.target.id === 'stStartBtn') stStartTest();
+    if (e.target.id === 'stFinishBtn') stFinishTest();
+    if (e.target.id === 'stRetryBtn') { document.getElementById('speedTestResult').classList.add('hidden'); document.getElementById('speedTestSetup').classList.remove('hidden'); }
+    if (e.target.id === 'stSubmitBtn') {
+      if (!authToken) { showAuthOverlay(); return; }
+      var r = stState._lastResult;
+      if (!r) return;
+      apiCall('/api/leaderboard/submit', { token: authToken, language: r.language, speed: r.speed, accuracy: r.accuracy, total_chars: r.total_chars, difficulty: r.difficulty }).then(function (res) {
+        if (res.error) { alert(res.error); return; }
+        alert('Результат отправлен в таблицу лидеров!');
+        document.getElementById('speedTestResult').classList.add('hidden');
+        document.getElementById('speedTestSetup').classList.remove('hidden');
+      });
+    }
+  });
+
+  // Leaderboard difficulty tabs
+  document.addEventListener('click', function (e) {
+    if (e.target.hasAttribute('data-lb-diff')) {
+      document.querySelectorAll('[data-lb-diff]').forEach(function (b) { b.classList.remove('active'); });
+      e.target.classList.add('active');
+      renderLeaderboard();
+    }
+  });
 
   document.addEventListener('DOMContentLoaded', init);
 })();

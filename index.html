@@ -128,6 +128,59 @@
             <button class="btn btn-secondary" id="settingsBtn">⚙ Настройки</button>
             <button class="btn btn-secondary" id="donateBtn">❤ Поддержать</button>
             <button class="btn btn-secondary" id="suggestionsBtn">💡 Идеи</button>
+            <button class="btn btn-secondary" id="speedTestBtn">⏱ Тест скорости</button>
+          </div>
+        </div>
+
+        <div class="speedtest-panel hidden" id="speedTestPanel">
+          <div class="speedtest-header">
+            <h3>⏱ Тест скорости печати</h3>
+            <button class="btn btn-sm btn-secondary" id="speedTestCloseBtn">✕</button>
+          </div>
+          <div class="speedtest-setup" id="speedTestSetup">
+            <div class="speedtest-row">
+              <label>Сложность:</label>
+              <select id="stDifficulty">
+                <option value="1">1 — только строчные</option>
+                <option value="2">2 — + заглавные</option>
+                <option value="3" selected>3 — + знаки препинания</option>
+              </select>
+              <label>Язык:</label>
+              <select id="stLang">
+                <option value="ru">Русский</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+            <div class="speedtest-row">
+              <label>Текст:</label>
+              <select id="stSource">
+                <option value="classic">Из классики</option>
+                <option value="custom">Свой текст</option>
+              </select>
+            </div>
+            <textarea id="stCustomText" class="speedtest-custom-text hidden" rows="3" placeholder="Введите свой текст для набора..."></textarea>
+            <button class="btn btn-primary" id="stStartBtn">Начать тест</button>
+          </div>
+          <div class="speedtest-active hidden" id="speedTestActive">
+            <div class="speedtest-stats">
+              <span>⏱ <span id="stTime">0</span>с</span>
+              <span>⚡ <span id="stSpeed">0</span> симв/мин</span>
+              <span>🎯 <span id="stAccuracy">100</span>%</span>
+              <span>📊 <span id="stProgress">0</span>%</span>
+            </div>
+            <div class="speedtest-text" id="stTextDisplay"></div>
+            <input type="text" id="stInput" class="speedtest-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <button class="btn btn-secondary" id="stFinishBtn">Завершить досрочно</button>
+          </div>
+          <div class="speedtest-result hidden" id="speedTestResult">
+            <div class="speedtest-result-stats">
+              <div>⚡ Скорость: <strong id="stResultSpeed">0</strong> симв/мин</div>
+              <div>🎯 Точность: <strong id="stResultAccuracy">0</strong>%</div>
+              <div>📝 Всего символов: <strong id="stResultChars">0</strong></div>
+              <div>⏱ Время: <strong id="stResultTime">0</strong>с</div>
+            </div>
+            <button class="btn btn-primary" id="stSubmitBtn">Отправить в таблицу лидеров</button>
+            <button class="btn btn-secondary" id="stRetryBtn">Попробовать снова</button>
           </div>
         </div>
 
@@ -299,6 +352,12 @@
             <button class="stat-tab" data-lb-lang="ru">Русский</button>
             <button class="stat-tab" data-lb-lang="en">English</button>
             <button class="stat-tab" data-lb-lang="code">Код</button>
+          </div>
+          <div class="stats-tabs" id="lbDiffTabs" style="margin-top:6px">
+            <button class="stat-tab active" data-lb-diff="">Любая сложность</button>
+            <button class="stat-tab" data-lb-diff="1">1 — строчные</button>
+            <button class="stat-tab" data-lb-diff="2">2 — + заглавные</button>
+            <button class="stat-tab" data-lb-diff="3">3 — + знаки</button>
           </div>
         </div>
         <div class="leaderboard-content" id="leaderboardContent">

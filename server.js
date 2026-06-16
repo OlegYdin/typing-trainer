@@ -120,20 +120,22 @@ function createS3Storage() {
       for (const row of rows) { try { progress[row.language] = JSON.parse(row.data); } catch (e) { progress[row.language] = null; } }
       return progress;
     },
-    async submitLeaderboard(user_id, display_name, language, speed, accuracy, total_chars) {
-      const idx = data.leaderboard.findIndex(e => e.user_id === user_id && e.language === language);
+    async submitLeaderboard(user_id, display_name, language, speed, accuracy, total_chars, difficulty) {
+      const d = difficulty || 0;
+      const idx = data.leaderboard.findIndex(e => e.user_id === user_id && e.language === language && e.difficulty === d);
       if (idx >= 0) {
         if (speed <= data.leaderboard[idx].speed) return { ok: true };
-        data.leaderboard[idx] = { user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, created_at: new Date().toISOString() };
+        data.leaderboard[idx] = { user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, difficulty: d, created_at: new Date().toISOString() };
       } else {
-        data.leaderboard.push({ user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, created_at: new Date().toISOString() });
+        data.leaderboard.push({ user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, difficulty: d, created_at: new Date().toISOString() });
       }
       await s3Save(data);
       return { ok: true };
     },
-    async getLeaderboard(lang) {
+    async getLeaderboard(lang, difficulty) {
       let rows = data.leaderboard;
       if (lang) rows = rows.filter(r => r.language === lang);
+      if (difficulty !== undefined && difficulty !== null) rows = rows.filter(r => (r.difficulty || 0) === Number(difficulty));
       rows.sort((a, b) => b.speed - a.speed || b.accuracy - a.accuracy);
       return rows.slice(0, 100);
     },
@@ -278,20 +280,22 @@ function createJsonStorage() {
       for (const row of rows) { try { progress[row.language] = JSON.parse(row.data); } catch (e) { progress[row.language] = null; } }
       return progress;
     },
-    submitLeaderboard(user_id, display_name, language, speed, accuracy, total_chars) {
-      const idx = data.leaderboard.findIndex(e => e.user_id === user_id && e.language === language);
+    submitLeaderboard(user_id, display_name, language, speed, accuracy, total_chars, difficulty) {
+      const d = difficulty || 0;
+      const idx = data.leaderboard.findIndex(e => e.user_id === user_id && e.language === language && e.difficulty === d);
       if (idx >= 0) {
         if (speed <= data.leaderboard[idx].speed) return { ok: true };
-        data.leaderboard[idx] = { user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, created_at: new Date().toISOString() };
+        data.leaderboard[idx] = { user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, difficulty: d, created_at: new Date().toISOString() };
       } else {
-        data.leaderboard.push({ user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, created_at: new Date().toISOString() });
+        data.leaderboard.push({ user_id, display_name, language, speed, accuracy: accuracy || 0, total_chars: total_chars || 0, difficulty: d, created_at: new Date().toISOString() });
       }
       fs.writeFileSync(dataPath, JSON.stringify(data));
       return { ok: true };
     },
-    getLeaderboard(lang) {
+    getLeaderboard(lang, difficulty) {
       let rows = data.leaderboard;
       if (lang) rows = rows.filter(r => r.language === lang);
+      if (difficulty !== undefined && difficulty !== null) rows = rows.filter(r => (r.difficulty || 0) === Number(difficulty));
       rows.sort((a, b) => b.speed - a.speed || b.accuracy - a.accuracy);
       return rows.slice(0, 100);
     },
@@ -410,15 +414,15 @@ app.post('/api/leaderboard/submit', async (req, res) => {
   const st = await getStorage();
   const user = await st.getUserFromToken(req.body.token);
   if (!user) return res.json({ error: 'Not authenticated' });
-  const { language, speed, accuracy, total_chars } = req.body;
+  const { language, speed, accuracy, total_chars, difficulty } = req.body;
   if (!language || speed == null) return res.json({ error: 'Missing fields' });
-  const r = await st.submitLeaderboard(user.user_id, user.display_name, language, speed, accuracy, total_chars);
+  const r = await st.submitLeaderboard(user.user_id, user.display_name, language, speed, accuracy, total_chars, difficulty);
   res.json(r);
 });
 
 app.get('/api/leaderboard', async (req, res) => {
   const s = await getStorage();
-  const rows = await s.getLeaderboard(req.query.lang || null);
+  const rows = await s.getLeaderboard(req.query.lang || null, req.query.difficulty || null);
   res.json(rows);
 });
 
