@@ -2005,6 +2005,18 @@
       stState.active = false;
       stPopulateAuthors(document.getElementById('stLang').value);
     }
+    if (e.target.id === 'shareBtn') {
+      var url = 'https://xn--80aaajkzcab0ad0a1a4d8d.xn--p1ai/';
+      if (navigator.share) {
+        navigator.share({ title: 'Клавиатурный тренажёр', text: 'Улучшай скорость печати!', url: url }).catch(function(){});
+      } else {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function(){ alert('Ссылка скопирована в буфер обмена!'); });
+        } else {
+          prompt('Скопируйте ссылку:', url);
+        }
+      }
+    }
     if (e.target.id === 'speedTestCloseBtn') {
       document.getElementById('speedTestPanel').classList.add('hidden');
       document.querySelector('.main-layout').classList.remove('hidden');
