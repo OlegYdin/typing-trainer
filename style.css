@@ -784,6 +784,9 @@ header h1 {
   text-align: left;
   max-width: 400px;
 }
+.modal-stats.modal-lb {
+  max-width: 680px;
+}
 
 .modal-stats h2 {
   background: none;
@@ -1130,12 +1133,15 @@ header h1 {
 .leaderboard-content {
   max-height: 400px;
   overflow-y: auto;
+  overflow-x: auto;
   margin: 16px 0;
   border-radius: 8px;
   background: var(--bg);
+  -webkit-overflow-scrolling: touch;
 }
 .lb-table {
   width: 100%;
+  min-width: 580px;
   border-collapse: collapse;
   font-size: 0.9rem;
 }
