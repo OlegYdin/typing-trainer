@@ -131,6 +131,34 @@
             <button class="btn btn-secondary" id="speedTestBtn">⏱ Тест скорости</button>
           </div>
         </div>
+
+        <aside class="side-panel">
+          <div class="side-card" id="lastResultCard">
+            <div class="side-card-title">Предыдущий результат</div>
+            <div class="last-result-body" id="lastResultBody">
+              <div class="lr-row">
+                <span class="lr-icon">⚡</span>
+                <span class="lr-value" id="lrSpeed">—</span>
+                <span class="lr-delta" id="lrSpeedDelta"></span>
+              </div>
+              <div class="lr-row">
+                <span class="lr-icon">🎯</span>
+                <span class="lr-value" id="lrAccuracy">—</span>
+                <span class="lr-delta" id="lrAccuracyDelta"></span>
+              </div>
+            </div>
+            <div class="lr-empty" id="lrEmpty">Пока нет данных</div>
+          </div>
+
+          <div class="side-card">
+            <div class="side-card-title" id="sideCardTitle">
+              <span id="sideCardLabel">Буквы</span>
+              <span class="side-card-sub" id="sideCardSub"><strong id="unlockedCount">0</strong>/<strong id="totalCount">33</strong></span>
+            </div>
+            <div class="letters-grid" id="lettersGrid"></div>
+            <div class="next-letter-hint" id="nextLetterHint">След: <span class="nl-badge" id="nextLetter">—</span></div>
+          </div>
+        </aside>
       </div>
 
       <div class="speedtest-panel hidden" id="speedTestPanel">
@@ -184,35 +212,6 @@
             <button class="btn btn-secondary" id="stRetryBtn">Попробовать снова</button>
           </div>
         </div>
-
-        <aside class="side-panel">
-          <div class="side-card" id="lastResultCard">
-            <div class="side-card-title">Предыдущий результат</div>
-            <div class="last-result-body" id="lastResultBody">
-              <div class="lr-row">
-                <span class="lr-icon">⚡</span>
-                <span class="lr-value" id="lrSpeed">—</span>
-                <span class="lr-delta" id="lrSpeedDelta"></span>
-              </div>
-              <div class="lr-row">
-                <span class="lr-icon">🎯</span>
-                <span class="lr-value" id="lrAccuracy">—</span>
-                <span class="lr-delta" id="lrAccuracyDelta"></span>
-              </div>
-            </div>
-            <div class="lr-empty" id="lrEmpty">Пока нет данных</div>
-          </div>
-
-          <div class="side-card">
-            <div class="side-card-title" id="sideCardTitle">
-              <span id="sideCardLabel">Буквы</span>
-              <span class="side-card-sub" id="sideCardSub"><strong id="unlockedCount">0</strong>/<strong id="totalCount">33</strong></span>
-            </div>
-            <div class="letters-grid" id="lettersGrid"></div>
-            <div class="next-letter-hint" id="nextLetterHint">След: <span class="nl-badge" id="nextLetter">—</span></div>
-          </div>
-        </aside>
-      </div>
     </main>
 
     <div class="modal-overlay hidden" id="modalOverlay">
