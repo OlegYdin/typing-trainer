@@ -1979,7 +1979,7 @@
     var chars = document.querySelectorAll('#stTextDisplay .st-char');
     for (var i = 0; i < chars.length; i++) {
       chars[i].className = 'st-char';
-      if (i < val.length) { if (val[i] === text[i]) { chars[i].classList.add('st-correct'); } else { chars[i].classList.add('st-incorrect'); if (i === val.length - 1) stState.errors++; } }
+      if (i < val.length) { if (val[i] === text[i]) { chars[i].classList.add('st-correct'); } else { chars[i].classList.add('st-incorrect'); stState.errors++; } }
     }
     if (val.length > 0 && val.length <= chars.length) { chars[Math.min(val.length, chars.length - 1)].classList.add('st-current'); }
     if (val.length >= text.length) stFinishTest();
