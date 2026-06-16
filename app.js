@@ -1805,36 +1805,36 @@
   // ---- Speed test ----
   var ST_TEXTS = {
     ru: [
-      'Мой дядя самых честных правил когда не в шутку занемог он уважать себя заставил и лучше выдумать не мог',
-      'Все счастливые семьи похожи друг на друга каждая несчастливая семья несчастлива по своему',
-      'В человеке должно быть все прекрасно и лицо и одежда и душа и мысли',
-      'Скажи ка дядя ведь недаром Москва спаленная пожаром французу отдана',
-      'Быть или не быть вот в чем вопрос что благородней духом покоряться пращам и стрелам яростной судьбы',
-      'Гроза в двенадцатом году пришла кто тут помог нам озлобление народа Барклай зима иль русский бог',
-      'Татьяна верила преданьям простонародной старины и снам и карточным гаданьям и предсказаниям луны',
-      'В басне как в жизни нет ничего лишнего все к чему то ведет',
-      'Кто с пользою отечеству трудится тот легко с ним не разлучится',
-      'Умом Россию не понять аршином общим не измерить у ней особенная стать в Россию можно только верить',
-      'Человек создан для счастья как птица для полета',
-      'На дне души у каждого человека есть своя маленькая бездонная пропасть',
-      'Любите книгу источник знания только знание спасательно только оно может сделать вас духовно сильными',
-      'Самое дорогое у человека это жизнь она дается ему один раз и прожить ее надо так чтобы не было мучительно больно',
+      'Мой дядя самых честных правил когда не в шутку занемог он уважать себя заставил и лучше выдумать не мог Его пример другим наука Но боже мой какая скука с больным сидеть и день и ночь не отходя ни шагу прочь Какое низкое коварство полуживого забавлять ему подушки поправлять печально подносить лекарство вздыхать и думать про себя когда же черт возьмет тебя',
+      'Все счастливые семьи похожи друг на друга каждая несчастливая семья несчастлива по своему Все смешалось в доме Облонских Жена узнала что муж был в связи с бывшею в их доме француженкою гувернанткой и объявила мужу что не может жить с ним в одном доме',
+      'В человеке должно быть все прекрасно и лицо и одежда и душа и мысли Я часто вижу прекрасное лицо и такую одежду что кружится голова от восторга но душа и мысли боже мой В иной красивой оболочке прячется иногда такая темная душа что не отрешь ее никакими белилами',
+      'Скажи ка дядя ведь недаром Москва спаленная пожаром французу отдана Ведь были ж схватки боевые да говорят еще какие Недаром помнит вся Россия про день Бородина Да были люди в наше время могучее лихое племя богатыри не вы',
+      'Татьяна верила преданьям простонародной старины и снам и карточным гаданьям и предсказаниям луны Ее тревожили приметы Татьяна милая Татьяна с тобой теперь я слезы лью Ты в руки модного тирана уж отдала судьбу свою Погибнешь милая но прежде ты в ослепительной надежде блаженство темное зовешь',
+      'Самое дорогое у человека это жизнь Она дается ему один раз и прожить ее надо так чтобы не было мучительно больно за бесцельно прожитые годы Чтобы не жег позор за подленькое и мелочное прошлое И чтобы умирая мог сказать вся жизнь и все силы были отданы самому прекрасному в мире борьбе за освобождение человечества',
+      'Человек создан для счастья как птица для полета Но счастье не всегда приходит к тому кто его ищет Иногда оно прячется за поворотом и ждет когда ты перестанешь бежать и просто оглянешься вокруг И тогда ты увидишь что оно было рядом все это время в мелочах в улыбке близкого человека в теплом луче солнца',
+      'Умом Россию не понять аршином общим не измерить у ней особенная стать в Россию можно только верить Но я люблю тебя родина странная любовь Ни слава купленная кровью ни полный гордого доверия покой ни темной старины заветные преданья не шевелят во мне отрадного мечтанья',
+      'Любите книгу источник знания Только знание спасательно только оно может сделать вас духовно сильными честными разумными людьми способными искренне любить человека уважать его труд и восхищаться плодами его непрерывного великого труда Книга это волшебница книга преобразила мир',
+      'Гроза в двенадцатом году пришла кто тут помог нам озлобление народа Барклай зима иль русский бог Но бог помог стал русский дух и сила И гром войны и пламень злобы в душе родили семя добра И добрым словом помянули тех кто за родину свою сложил голову свою в том страшном пламени войны',
+      'На дне души у каждого человека есть своя маленькая бездонная пропасть Туда мы прячем самые сокровенные мечты самые страшные тайны и самые светлые воспоминания Иногда нам кажется что мы забыли о них но стоит лишь остаться наедине с собой как они всплывают из глубины',
+      'Быть или не быть вот в чем вопрос Что благородней духом покоряться пращам и стрелам яростной судьбы Иль ополчась на море смут сразить их противоборством Умереть уснуть и только И сказать что сном кончаешь тоску и тысячу природных мук наследство плоти как такая развязка не желанна',
+      'Кто с пользою отечеству трудится тот легко с ним не разлучится Но труд должен быть свободным потому что только свободный труд приносит плоды Истинное назначение человека жить а не существовать Жить полной жизнью значит чувствовать радоваться каждому мгновению',
+      'Тьмы низких истин нам дороже нас возвышающий обман Оставь герой мое сердце останься верным до конца Мы ждем с томленьем упованья минуты вольности святой Как ждет любовник молодой минуты верного свиданья Пока свободою горим пока сердца для чести живы мой друг отчизне посвятим души прекрасные порывы',
     ],
     en: [
-      'It was the best of times it was the worst of times it was the age of wisdom it was the age of foolishness',
-      'To be or not to be that is the question whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune',
-      'All happy families are alike each unhappy family is unhappy in its own way',
-      'Call me Ishmael some years ago never mind how long precisely having little or no money in my purse',
-      'It is a truth universally acknowledged that a single man in possession of a good fortune must be in want of a wife',
-      'The only way to have a friend is to be one',
-      'In the middle of difficulty lies opportunity',
-      'Two roads diverged in a wood and I took the one less traveled by and that has made all the difference',
-      'It was a bright cold day in April and the clocks were striking thirteen',
-      'Happy families are all alike every unhappy family is unhappy in its own way',
-      'The old man and the sea is a story of a man who refuses to give up despite all the hardships',
-      'All animals are equal but some animals are more equal than others',
-      'It is a far far better thing that I do than I have ever done it is a far far better rest that I go to than I have ever known',
-      'The sky above the port was the color of television tuned to a dead channel',
+      'It was the best of times it was the worst of times it was the age of wisdom it was the age of foolishness it was the epoch of belief it was the epoch of incredulity it was the season of light it was the season of darkness it was the spring of hope it was the winter of despair',
+      'To be or not to be that is the question whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune or to take arms against a sea of troubles and by opposing end them To die to sleep no more and by a sleep to say we end the heartache and the thousand natural shocks',
+      'All happy families are alike each unhappy family is unhappy in its own way Everything was in confusion in the Oblonsky house The wife had discovered that the husband was carrying on an intrigue with a French girl who had been a governess in their family',
+      'Call me Ishmael Some years ago never mind how long precisely having little or no money in my purse and nothing particular to interest me on shore I thought I would sail about a little and see the watery part of the world It is a way I have of driving off the spleen',
+      'It is a truth universally acknowledged that a single man in possession of a good fortune must be in want of a wife However little known the feelings or views of such a man may be on his first entering a neighbourhood this truth is so well fixed in the minds of the surrounding families',
+      'It was a bright cold day in April and the clocks were striking thirteen Winston Smith his chin nuzzled into his breast in an effort to escape the vile wind slipped quickly through the glass doors of Victory Mansions though not quickly enough to prevent a swirl of gritty dust from entering along with him',
+      'The sky above the port was the color of television tuned to a dead channel Case was twenty four and already he could feel the tide turning for him He wore his darkness like a crown and walked the neon lit streets of Chiba City with the confidence of a man who had nothing left to lose',
+      'It is a far far better thing that I do than I have ever done it is a far far better rest that I go to than I have ever known The night was dark and the wind howled through the narrow streets of Paris as the tumbrils rumbled toward the Place de la Revolution',
+      'All animals are equal but some animals are more equal than others The pigs who were the cleverest of all had worked out the principles of Animalism and they taught the other animals that the true nature of man was to be cruel and selfish while the true nature of animals was to be hardworking and kind',
+      'The old man and the sea is a story of a man who refuses to give up despite all the hardships He had gone eighty four days now without taking a fish and his hands were marked with the deep creases from the fishing line But he still had hope in his heart',
+      'Two roads diverged in a yellow wood and sorry I could not travel both and be one traveler long I stood and looked down one as far as I could to where it bent in the undergrowth Then took the other as just as fair and having perhaps the better claim because it was grassy and wanted wear',
+      'Happy families are all alike every unhappy family is unhappy in its own way The oblique glance she gave him told him everything She knew He had seen that look before it was the look of a woman who had made up her mind and there was no changing it',
+      'The only way to have a friend is to be one Friendship is a plant of slow growth and must undergo and withstand the shocks of adversity before it is entitled to the appellation True friendship is like a shadow that comes and goes while the sunshine of prosperity is upon it',
+      'In the middle of difficulty lies opportunity A man who dares to waste one hour of time has not discovered the value of life The greatest glory in living lies not in never falling but in rising every time we fall Do not go where the path may lead go instead where there is no path and leave a trail',
     ],
   };
 
@@ -1856,7 +1856,7 @@
     if (source === 'custom' && customText) { raw = customText; }
     else { var texts = ST_TEXTS[lang] || ST_TEXTS.ru; raw = texts[Math.floor(Math.random() * texts.length)]; }
     var text = stTransform(raw, diff);
-    if (text.length < 10) { alert('Слишком короткий текст'); return; }
+    while (text.length < 300) text += ' ' + text;
     stState.text = text; stState.typed = ''; stState.errors = 0; stState.totalTyped = 0; stState.active = true; stState.startTime = Date.now();
     document.getElementById('speedTestSetup').classList.add('hidden');
     document.getElementById('speedTestActive').classList.remove('hidden');
@@ -1884,9 +1884,16 @@
     if (!stState.active) return;
     stState.active = false;
     if (stState.timerInterval) { clearInterval(stState.timerInterval); stState.timerInterval = null; }
+    var total = stState.totalTyped;
+    if (!total || total < 5) {
+      document.getElementById('speedTestActive').classList.add('hidden');
+      document.getElementById('speedTestSetup').classList.remove('hidden');
+      return;
+    }
     var elapsed = (Date.now() - stState.startTime) / 1000;
-    var total = stState.totalTyped || stState.text.length;
+    if (elapsed < 1) elapsed = 1;
     var speed = Math.round((total - stState.errors) / elapsed * 60);
+    if (speed < 0) speed = 0;
     var accuracy = Math.round((1 - stState.errors / total) * 100);
     document.getElementById('speedTestActive').classList.add('hidden');
     document.getElementById('speedTestResult').classList.remove('hidden');
