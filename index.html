@@ -131,37 +131,38 @@
             <button class="btn btn-secondary" id="speedTestBtn">⏱ Тест скорости</button>
           </div>
         </div>
+      </div>
 
-        <div class="speedtest-panel hidden" id="speedTestPanel">
-          <div class="speedtest-header">
-            <h3>⏱ Тест скорости печати</h3>
-            <button class="btn btn-sm btn-secondary" id="speedTestCloseBtn">✕</button>
+      <div class="speedtest-panel hidden" id="speedTestPanel">
+        <div class="speedtest-header">
+          <h3>⏱ Тест скорости печати</h3>
+          <button class="btn btn-sm btn-secondary" id="speedTestCloseBtn">✕</button>
+        </div>
+        <div class="speedtest-setup" id="speedTestSetup">
+          <div class="speedtest-row">
+            <label>Сложность:</label>
+            <select id="stDifficulty">
+              <option value="1">1 — только строчные</option>
+              <option value="2">2 — + заглавные</option>
+              <option value="3" selected>3 — + знаки препинания</option>
+            </select>
+            <label>Язык:</label>
+            <select id="stLang">
+              <option value="ru">Русский</option>
+              <option value="en">English</option>
+            </select>
           </div>
-          <div class="speedtest-setup" id="speedTestSetup">
-            <div class="speedtest-row">
-              <label>Сложность:</label>
-              <select id="stDifficulty">
-                <option value="1">1 — только строчные</option>
-                <option value="2">2 — + заглавные</option>
-                <option value="3" selected>3 — + знаки препинания</option>
-              </select>
-              <label>Язык:</label>
-              <select id="stLang">
-                <option value="ru">Русский</option>
-                <option value="en">English</option>
-              </select>
-            </div>
-            <div class="speedtest-row">
-              <label>Текст:</label>
-              <select id="stSource">
-                <option value="classic">Из классики</option>
-                <option value="custom">Свой текст</option>
-              </select>
-            </div>
-            <textarea id="stCustomText" class="speedtest-custom-text hidden" rows="3" placeholder="Введите свой текст для набора..."></textarea>
-            <button class="btn btn-primary" id="stStartBtn">Начать тест</button>
+          <div class="speedtest-row">
+            <label>Текст:</label>
+            <select id="stSource">
+              <option value="classic">Из классики</option>
+              <option value="custom">Свой текст</option>
+            </select>
           </div>
-          <div class="speedtest-active hidden" id="speedTestActive">
+          <textarea id="stCustomText" class="speedtest-custom-text hidden" rows="3" placeholder="Введите свой текст для набора..."></textarea>
+          <button class="btn btn-primary" id="stStartBtn">Начать тест</button>
+        </div>
+        <div class="speedtest-active hidden" id="speedTestActive">
             <div class="speedtest-stats">
               <span>⏱ <span id="stTime">0</span>с</span>
               <span>⚡ <span id="stSpeed">0</span> симв/мин</span>

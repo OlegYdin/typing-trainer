@@ -1919,6 +1919,7 @@
   });
   document.addEventListener('click', function (e) {
     if (e.target.id === 'speedTestBtn') {
+      document.querySelector('.main-layout').classList.toggle('hidden');
       document.getElementById('speedTestPanel').classList.toggle('hidden');
       document.getElementById('speedTestSetup').classList.remove('hidden');
       document.getElementById('speedTestActive').classList.add('hidden');
@@ -1928,6 +1929,7 @@
     }
     if (e.target.id === 'speedTestCloseBtn') {
       document.getElementById('speedTestPanel').classList.add('hidden');
+      document.querySelector('.main-layout').classList.remove('hidden');
       if (stState.timerInterval) { clearInterval(stState.timerInterval); stState.timerInterval = null; }
       stState.active = false;
     }
