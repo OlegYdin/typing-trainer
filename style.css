@@ -1592,13 +1592,18 @@ header h1 {
   font-size: 1.1rem;
   line-height: 1.6;
   padding: 12px;
-  background: var(--surface2);
-  border-radius: 8px;
-  margin-bottom: 10px;
-  min-height: 60px;
   word-break: break-word;
   color: var(--text-dim);
   user-select: none;
+  transition: transform 0.12s ease;
+}
+.speedtest-scroll-wrap {
+  background: var(--surface2);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  height: calc(3 * 1.6em + 24px);
+  overflow: hidden;
+  position: relative;
 }
 .speedtest-text .st-correct {
   color: var(--correct);
@@ -1624,6 +1629,8 @@ header h1 {
   font-size: 1rem;
   outline: none;
   margin-bottom: 10px;
+  resize: none;
+  box-sizing: border-box;
 }
 .speedtest-input:focus {
   box-shadow: 0 0 0 2px rgba(108,99,255,0.3);

@@ -182,10 +182,14 @@
           </div>
           <div class="speedtest-row">
             <label>Текст:</label>
-            <select id="stSource">
-              <option value="classic">Из классики</option>
+            <select id="stSource" style="flex:1">
+              <option value="classic">Случайный из классики</option>
               <option value="custom">Свой текст</option>
             </select>
+          </div>
+          <div class="speedtest-row" id="stAuthorRow">
+            <label>Произведение:</label>
+            <select id="stAuthor" style="flex:1"></select>
           </div>
           <textarea id="stCustomText" class="speedtest-custom-text hidden" rows="3" placeholder="Введите свой текст для набора..."></textarea>
           <button class="btn btn-primary" id="stStartBtn">Начать тест</button>
@@ -197,8 +201,10 @@
               <span>🎯 <span id="stAccuracy">100</span>%</span>
               <span>📊 <span id="stProgress">0</span>%</span>
             </div>
-            <div class="speedtest-text" id="stTextDisplay"></div>
-            <input type="text" id="stInput" class="speedtest-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <div class="speedtest-scroll-wrap">
+              <div class="speedtest-text" id="stTextDisplay"></div>
+            </div>
+            <textarea id="stInput" class="speedtest-input" rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Начните печатать..."></textarea>
             <button class="btn btn-secondary" id="stFinishBtn">Завершить досрочно</button>
           </div>
           <div class="speedtest-result hidden" id="speedTestResult">
