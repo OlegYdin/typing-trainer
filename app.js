@@ -1799,7 +1799,15 @@
       }
       applyTheme(state.theme);
       applyScale(state.uiScale || 100);
+      fetchStats();
     });
+  }
+
+  function fetchStats() {
+    fetch(API_HOST + '/api/stats').then(function(r){return r.json();}).then(function(s){
+      document.getElementById('visitCount').textContent = s.visits || 0;
+      if (s.users > 0) document.getElementById('visitCount').textContent = (s.visits || 0) + ' / ' + s.users;
+    }).catch(function(){});
   }
 
   // ---- Speed test ----

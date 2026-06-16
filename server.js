@@ -11,6 +11,12 @@ const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'OlegYdin';
 app.use(express.json({ limit: '2mb' }));
 app.get('/health', (req, res) => res.json({ ok: true }));
 
+app.get('/api/stats', async (req, res) => {
+  const s = await getStorage();
+  const d = s._raw ? s._raw() : s.data;
+  res.json({ visits: d.visits || 0, users: (d.users || []).length });
+});
+
 function hashPhrase(p) { return crypto.createHash('sha256').update(p).digest('hex'); }
 function generateToken() { return crypto.randomBytes(32).toString('hex'); }
 
@@ -78,7 +84,7 @@ function createS3Storage() {
 
   return {
     async init() {
-      data = await s3Load() || { users: [], sessions: [], progress: [], leaderboard: [], suggestions: [], comments: [] };
+      data = await s3Load() || { users: [], sessions: [], progress: [], leaderboard: [], suggestions: [], comments: [], visits: 0 };
     },
     async _save() {
       await s3Save(data);
@@ -211,7 +217,8 @@ function createS3Storage() {
       if (s) s.comments = (data.comments || []).filter(c => c.suggestion_id === s.id).length;
       await s3Save(data);
       return { ok: true };
-    }
+    },
+    _raw() { return data; }
   };
 }
 
@@ -241,7 +248,7 @@ function createJsonStorage() {
   let data;
   return {
     init() {
-      try { data = JSON.parse(fs.readFileSync(dataPath, 'utf8')); } catch (e) { data = { users: [], sessions: [], progress: [], leaderboard: [], suggestions: [], comments: [] }; }
+      try { data = JSON.parse(fs.readFileSync(dataPath, 'utf8')); } catch (e) { data = { users: [], sessions: [], progress: [], leaderboard: [], suggestions: [], comments: [], visits: 0 }; }
     },
     register(username, phrase, display_name) {
       if (data.users.find(u => u.username === username)) return { error: 'Username already taken' };
@@ -371,7 +378,8 @@ function createJsonStorage() {
       if (s) s.comments = (data.comments || []).filter(c => c.suggestion_id === s.id).length;
       fs.writeFileSync(dataPath, JSON.stringify(data));
       return { ok: true };
-    }
+    },
+    _raw() { return data; }
   };
 }
 
@@ -501,8 +509,18 @@ app.post('/api/suggestions/:id/comments/:commentId/delete', async (req, res) => 
   res.json(r);
 });
 
+app.get('/', async function (req, res, next) {
+  try {
+    const s = await getStorage();
+    if (s._raw) {
+      const d = s._raw();
+      d.visits = (d.visits || 0) + 1;
+      if (s._save) s._save().catch(function(){});
+    }
+  } catch(e) {}
+  next();
+});
 app.use(express.static(__dirname));
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 // ---- Start ----
 (async () => {
