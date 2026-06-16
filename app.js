@@ -2037,6 +2037,22 @@
         document.getElementById('speedTestSetup').classList.remove('hidden');
       });
     }
+    if (e.target.id === 'stShareResultBtn') {
+      var r = stState._lastResult;
+      if (!r) return;
+      var url = 'https://xn--80aaajkzcab0ad0a1a4d8d.xn--p1ai/';
+      var text = 'Я набрал ' + r.speed + ' симв/мин с точностью ' + r.accuracy + '% в клавиатурном тренажёре! Попробуй побить мой рекорд 🏆';
+      if (navigator.share) {
+        navigator.share({ title: 'Клавиатурный тренажёр', text: text, url: url }).catch(function(){});
+      } else {
+        var full = text + ' ' + url;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(full).then(function(){ alert('Результат скопирован! Можно вставить в пост.'); });
+        } else {
+          prompt('Скопируйте текст:', full);
+        }
+      }
+    }
   });
 
   // Leaderboard difficulty tabs
