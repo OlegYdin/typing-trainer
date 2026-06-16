@@ -1631,6 +1631,7 @@ header h1 {
   margin-bottom: 10px;
   resize: none;
   box-sizing: border-box;
+  min-height: 60px;
 }
 .speedtest-input:focus {
   box-shadow: 0 0 0 2px rgba(108,99,255,0.3);

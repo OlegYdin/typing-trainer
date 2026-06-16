@@ -1922,7 +1922,7 @@
     el.style.transform = '';
     var inp = document.getElementById('stInput');
     inp.value = '';
-    inp.style.height = 'auto';
+    inp.style.height = '';
     inp.focus();
     if (stState.timerInterval) clearInterval(stState.timerInterval);
     stState.timerInterval = setInterval(function () {
@@ -1943,6 +1943,8 @@
     stState.active = false;
     if (stState.timerInterval) { clearInterval(stState.timerInterval); stState.timerInterval = null; }
     var total = stState.totalTyped;
+    var fullText = stState.text.length;
+    var completed = total >= fullText;
     if (!total || total < 5) {
       document.getElementById('speedTestActive').classList.add('hidden');
       document.getElementById('speedTestSetup').classList.remove('hidden');
@@ -1959,6 +1961,7 @@
     document.getElementById('stResultAccuracy').textContent = Math.min(accuracy, 100);
     document.getElementById('stResultChars').textContent = total;
     document.getElementById('stResultTime').textContent = Math.floor(elapsed);
+    document.getElementById('stSubmitBtn').classList.toggle('hidden', !completed);
     stState._lastResult = { speed: speed, accuracy: Math.min(accuracy, 100), total_chars: total, difficulty: parseInt(document.getElementById('stDifficulty').value), language: document.getElementById('stLang').value };
   }
 
